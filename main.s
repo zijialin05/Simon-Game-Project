@@ -1,24 +1,15 @@
-	#include <xc.inc>
+#include <xc.inc>
+
+extrn	DAC_Setup, DAC_Int_Hi
 
 psect	code, abs
-	
-main:
-	org	0x0
+rst:	org	0x0000	; reset vector
 	goto	start
 
-	org	0x100		    ; Main code starts here at address 0x100
-start:
-	movlw 	0x0
-	movwf	TRISB, A	    ; Port C all outputs
-	bra 	test
-loop:
-	movff 	0x06, PORTB
-	incf 	0x06, W, A
-test:
-	movwf	0x06, A	    ; Test for end of loop condition
-	movlw 	0x63
-	cpfsgt 	0x06, A
-	bra 	loop		    ; Not yet finished goto start of loop again
-	goto 	0x0		    ; Re-run program from start
+int_hi:	org	0x0008	; high vector, no low vector
+	goto	DAC_Int_Hi
+	
+start:	call	DAC_Setup
+	goto	$	; Sit in infinite loop
 
-	end	main
+	end	rst

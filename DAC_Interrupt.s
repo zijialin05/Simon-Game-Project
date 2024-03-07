@@ -47,9 +47,9 @@ DAC_Int_Hi:
 	btfsc	STATUS, 2
 	call	RST
 	bcf	TMR0IF		; clear interrupt flag
-	movlw	0xFF
+	movlw	0xFE
 	movwf	TMR0L, A
-	movlw	0xF0
+	movlw	0xE4
 	movwf	TMR0H, A
 	bsf	TMR0IE		; Enable timer0 interrupt
 	retfie	f		; fast return from interrupt
@@ -60,7 +60,7 @@ DAC_Setup:
 	clrf	LATJ, A		; Clear PORTD outputs
 	movlw	0xFF
 	movwf	LATH, A
-	movlw	10000111B	; Set timer0 to 16-bit, Fosc/4/256
+	movlw	10001000B	; Set timer0 to 16-bit, Fosc/4/256
 	movwf	T0CON, A	; = 62.5KHz clock rate, approx 1sec rollover
 	bsf	TMR0IE		; Enable timer0 interrupt
 	bsf	GIE		; Enable all interrupts
