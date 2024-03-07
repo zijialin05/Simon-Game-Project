@@ -1,6 +1,6 @@
 #include <xc.inc>
 	
-global	DAC_Setup, DAC_Int_Hi
+global	DAC_Setup, DAC_Int_Hi, Trial_Int_Hi
 psect	udata_acs
 counter:    ds	1
 
@@ -31,6 +31,21 @@ myTable:
 	align	2
 	
 psect	dac_code, class=CODE
+
+Trial_Int_Hi:
+	btfss	TMR0IF		; check that this is timer0 interrupt
+	retfie	f		; if not then return
+	movlw	0xFF
+	movwf	LATJ, A
+	movlw	0x00
+	movwf	LATJ, A
+	bcf	TMR0IF		; clear interrupt flag
+	movlw	0xFD
+	movwf	TMR0H, A
+	movlw	0xC8
+	movwf	TMR0L, A
+	bsf	TMR0IE		; Enable timer0 interrupt
+	retfie	f
 	
 DAC_Int_Hi:	
 	btfss	TMR0IF		; check that this is timer0 interrupt
@@ -39,7 +54,7 @@ DAC_Int_Hi:
 	movlw	0x00
 	movwf	LATH
 	tblrd*+
-	movff	TABLAT, PORTJ
+	movff	TABLAT, LATJ
 	movlw	0xFF
 	movwf	LATH
 	decfsz	counter, A
@@ -48,9 +63,9 @@ DAC_Int_Hi:
 	call	RST
 	bcf	TMR0IF		; clear interrupt flag
 	movlw	0xFE
-	movwf	TMR0L, A
-	movlw	0xE4
 	movwf	TMR0H, A
+	movlw	0x22
+	movwf	TMR0L, A
 	bsf	TMR0IE		; Enable timer0 interrupt
 	retfie	f		; fast return from interrupt
 
@@ -60,12 +75,6 @@ DAC_Setup:
 	clrf	LATJ, A		; Clear PORTD outputs
 	movlw	0xFF
 	movwf	LATH, A
-	movlw	10001000B	; Set timer0 to 16-bit, Fosc/4/256
-	movwf	T0CON, A	; = 62.5KHz clock rate, approx 1sec rollover
-	bsf	TMR0IE		; Enable timer0 interrupt
-	bsf	GIE		; Enable all interrupts
-	bcf	CFGS
-	bsf	EEPGD
 	lfsr	0, myArray
 	movlw	low highword(myTable)
 	movwf	TBLPTRU, A
@@ -75,7 +84,14 @@ DAC_Setup:
 	movwf	TBLPTRL, A
 	movlw	myTable_1
 	movwf	counter, A
+	movlw	10001000B	; Set timer0 to 16-bit, Fosc/4/256
+	movwf	T0CON, A	; = 62.5KHz clock rate, approx 1sec rollover
+	bsf	TMR0IE		; Enable timer0 interrupt
+	bsf	GIE		; Enable all interrupts
+	bcf	CFGS
+	bsf	EEPGD
 	
+
 	return
 	
 RST:

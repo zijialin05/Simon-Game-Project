@@ -1,6 +1,6 @@
 #include <xc.inc>
 
-extrn	DAC_Setup, DAC_Int_Hi
+extrn	DAC_Setup, DAC_Int_Hi, Trial_Int_Hi
 
 psect	code, abs
 rst:	org	0x0000	; reset vector
