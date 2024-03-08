@@ -50,7 +50,10 @@ Trial_Int_Hi:
 DAC_Int_Hi:	
 	btfss	TMR0IF		; check that this is timer0 interrupt
 	retfie	f		; if not then return
-	;incf	LATJ, F, A	; increment PORTD
+	movlw	0xFE
+	movwf	TMR0H, A
+	movlw	0xCD
+	movwf	TMR0L, A
 	movlw	0x00
 	movwf	LATH
 	tblrd*+
@@ -62,10 +65,6 @@ DAC_Int_Hi:
 	btfsc	STATUS, 2
 	call	RST
 	bcf	TMR0IF		; clear interrupt flag
-	movlw	0xFE
-	movwf	TMR0H, A
-	movlw	0x22
-	movwf	TMR0L, A
 	bsf	TMR0IE		; Enable timer0 interrupt
 	retfie	f		; fast return from interrupt
 
