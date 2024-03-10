@@ -16,6 +16,7 @@
       <itemPath>KeyPad.s</itemPath>
       <itemPath>config.s</itemPath>
       <itemPath>main.s</itemPath>
+      <itemPath>Game_Logics.s</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
