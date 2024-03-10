@@ -1,6 +1,6 @@
 #include <xc.inc>
 	
-global	DAC_Setup, DAC_Int_Hi, Trial_Int_Hi
+global	DAC_Setup, DAC_Int_Hi, Trial_Int_Hi, LFSR_Step
 psect	udata_acs
 counter:    ds	1
 
