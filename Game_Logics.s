@@ -1,6 +1,13 @@
 #include <xc.inc>
     
-global  LFSR_Step, LFSR_H, LFSR_L, TEMP, OUT, RESULT
+global  LFSR_Step, LFSR_H, LFSR_L, TEMP, OUT, RESULT, LFSR_Load_Fixed_Seed
+global	GEN_RAND_SEQ, FSR0L, FSR0H, COUNTER
+
+extrn	KP_Change, KPPrev
+
+psect	udata_bank5
+GENSEQ:	    ds	0x80
+INPTSEQ:    ds	0x80
 
 psect	udata_acs   ; reserve data space in access ram
 LFSR_H:	    ds	1
@@ -8,10 +15,7 @@ LFSR_L:	    ds	1
 TEMP:	    ds	1
 OUT:	    ds	1
 RESULT:	    ds	1
-CHAR1:	    ds	1
-CHAR2:	    ds	1
-CHAR3:	    ds	1
-CHAR4:	    ds	1
+COUNTER:    ds	1
 
 psect	uart_code,class=CODE
 
@@ -31,16 +35,19 @@ LFSR_Load_Seed:
     movlw   00000000B
     movwf   T0CON, A
     return
+    
+LFSR_Load_Fixed_Seed:
+    movlw   11110111B
+    movwf   LFSR_L, A
+    movlw   01011110B
+    movwf   LFSR_H, A
+    return
 
 LFSR_Step:
     ;Step 1: Calculate feedback from tap positions
     ; Most significant bit: bit 15. Least significant bit: bit 0
     ;Taps: Bit 0, 1, 3, 12 
     ; Check bit 0, XOR with TEMP
-    movlw   11110111B
-    movwf   LFSR_L, A
-    movlw   01011110B
-    movwf   LFSR_H, A
     movlw   0x00
     clrf    TEMP, A
     ; Check bit 0 (MSB of LFSR_HI), XOR with TEMP
@@ -96,3 +103,23 @@ LFSR_RANDINT:
     bra	    LFSR_RANDINT
     movf    RESULT, W, A
     return
+
+GEN_RAND_SEQ:
+    movwf   COUNTER, A
+    LFSR    0, GENSEQ
+Gen_seq:
+    call    LFSR_RANDINT
+    movwf   INDF0
+    INFSNZ  FSR0L, F, A
+    INCF    FSR0H, F, A
+    DECFSZ  COUNTER, F, A
+    bra	    Gen_seq
+    return
+
+INPUT_SEQ:
+    movwf   COUNTER, A
+    movlw   0x00
+    movwf   KPPrev, A
+ONE_INPUT:
+    call    KP_Change
+    

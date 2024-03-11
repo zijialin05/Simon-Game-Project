@@ -1,6 +1,6 @@
 #include <xc.inc>
     
-global  KP_Read, KP_Setup, KP_Change
+global  KP_Read, KP_Setup, KP_Change, KPPrev
 
 psect	udata_acs   ; reserve data space in access ram
 KP_cnt_l:   ds 1   ; reserve 1 byte for variable KP_cnt_l
@@ -121,6 +121,17 @@ KP_Change:
     retlw   0x00
 KP_SPAC:    ;save previous and current values
     movwf   KPPrev, A
+    return
+
+KPOWC:	;the Keypad function that Output When Change in button press detected
+    call    KP_Read
+    movwf   KPCurr, A
+    cpfseq  KPPrev, A
+    bra	    KP_SPAC
+    bra	    KPOWC
+KP_SPAC:    ;save previous and current values
+    movwf   KPPrev, A
+    movf    KPCurr, W, A
     return
     
 KP_delay_ms:		    ; delay given in ms in W
