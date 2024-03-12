@@ -17,6 +17,8 @@
       <itemPath>config.s</itemPath>
       <itemPath>main.s</itemPath>
       <itemPath>Game_Logics.s</itemPath>
+      <itemPath>GLCD.s</itemPath>
+      <itemPath>LCD.s</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

@@ -127,9 +127,9 @@ KPOWC:	;the Keypad function that Output When Change in button press detected
     call    KP_Read
     movwf   KPCurr, A
     cpfseq  KPPrev, A
-    bra	    KP_SPAC
+    bra	    KP_SPAC2
     bra	    KPOWC
-KP_SPAC:    ;save previous and current values
+KP_SPAC2:    ;save previous and current values
     movwf   KPPrev, A
     movf    KPCurr, W, A
     return
