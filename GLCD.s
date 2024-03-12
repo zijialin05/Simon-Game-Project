@@ -20,9 +20,11 @@ GLCD_Setup:
 	clrf	TRISD, A
 	clrf	TRISB, A
 	;Turn on the 2 displays
-	movlw	00000000B   ;set Enable to low
+	movlw	0x01
+	call	GLCD_delay_x4us
+	movlw	00100000B   ;set Reset to high and Enable to low
 	movwf	LATB, A
-	movlw	00000001B
+	movlw	00100001B
 	movwf	LATB, A	    ;control ready
 	movlw	00111111B
 	movwf	LATD, A	    ;data ready
@@ -40,7 +42,7 @@ GLCD_Setup:
 	nop
 	nop
 	bcf	LATB, 4, A  ;set Enable to low
-	movlw	00000010B
+	movlw	00100010B
 	movwf	LATB, A	    ;control Ready
 	movlw	00111111B
 	movwf	LATD, A	    ;data ready
@@ -57,26 +59,19 @@ GLCD_Setup:
 	nop
 	nop
 	nop
-	clrf	LATB, A
+	bcf	LATB, 4, A  ;set Enable to low	
 	clrf	LATD, A
-	;Reset both Screens
-	movlw	00100001B
-	movwf	LATB, A
-	movlw	0x02
-	call	GLCD_delay_ms
-	movlw	00100010B
-	movwf	LATB, A
-	movwf	0x02
-	call	GLCD_delay_ms
-	movlw	00000000B
+	movlw	00100000B
 	movwf	LATB, A
 	;Read Status
-	movlw	10110000B
-	movwf	TRISD, A
-	movlw	00001001B
+	setf	TRISD, A
+	movlw	00101001B
 	movwf	LATB, A
-	movlw	00000000B
-	movwf	LATD, A
+	nop
+	nop
+	nop
+	nop
+	nop
 	nop
 	nop
 	bsf	LATB, 4, A  ;Enable
@@ -89,11 +84,63 @@ GLCD_Setup:
 	nop
 	nop
 	movf	PORTD, W, A
+	bcf	LATB, 4, A
+	movlw	00100010B   ;select y
+	movwf	LATB
+	movlw	01010000B
+	movwf	LATD
 	nop
 	nop
+	nop
+	nop
+	bsf	LATB, 4, A  ;Enable
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	bcf	LATB, 4, A
+	movlw	00100010B   ;select x
+	movwf	LATB
+	movlw	10111011B
+	movwf	LATD
+	nop
+	nop
+	nop
+	nop
+	bsf	LATB, 4, A  ;Enable
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	bcf	LATB, 4, A
+	movlw	00100110B   ;write display data
+	movwf	LATB
+	movlw	11001111B
+	movwf	LATD
+	nop
+	nop
+	nop
+	nop
+	bsf	LATB, 4, A  ;Enable
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	bcf	LATB, 4, A
 	return
-	
-	
+
     
     
 GLCD_delay_ms:	; delay given in ms in W
