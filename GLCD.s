@@ -1,6 +1,8 @@
 #include <xc.inc>
     
 global  GLCD_Setup
+global	GLCD_Select_y1, GLCD_Select_y2, GLCD_Select_x1, GLCD_Select_x2
+global	GLCD_Write_Display1, GLCD_Write_Display2
 
 psect	udata_acs   ; reserve data space in access ram
 ; The first few variables are for the delay routines
@@ -53,6 +55,9 @@ GLCD_Read_Status:
 	nop
 	movf	PORTD, W, A	;Read from PORTD the STATUS
 	bcf	LATB, 4, A	;Set Enable to Low
+	clrf	TRISD, A	;Set to all output
+	movlw	0x05
+	call	GLCD_delay_x4us	;delay 20 microseconds
 	return
 	
 GLCD_Select_y1:
@@ -164,7 +169,26 @@ GLCD_Write_Display1:
 	bcf	LATB, 4, A  ;Set Enable Low.  High to Low transition occur
 	return
 
-	
+GLCD_Write_Display2:
+	bcf	LATB, 4, A  ;Set Enable Low
+	movwf	LATD	    ;Display Data in WREG, move to data line
+	movlw	00100101B   ;Write Display Instruction, Segmant 65-128 Selected
+	movwf	LATB	    ;control line
+	nop
+	nop
+	nop
+	nop		    ;500ns from Set Enable Low
+	bsf	LATB, 4, A  ;Set Enable High. Low to High transition occur
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop		    ;500ns from Set Enable High
+	bcf	LATB, 4, A  ;Set Enable Low.  High to Low transition occur
+	return
     
 GLCD_delay_ms:	; delay given in ms in W
 	movwf	GLCD_cnt_ms, A

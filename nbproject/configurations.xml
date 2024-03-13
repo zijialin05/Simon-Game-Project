@@ -19,6 +19,7 @@
       <itemPath>Game_Logics.s</itemPath>
       <itemPath>GLCD.s</itemPath>
       <itemPath>LCD.s</itemPath>
+      <itemPath>Bitmap_Outputs.s</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
