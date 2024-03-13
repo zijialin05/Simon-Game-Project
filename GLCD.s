@@ -4,67 +4,36 @@ global  GLCD_Setup
 
 psect	udata_acs   ; reserve data space in access ram
 ; The first few variables are for the delay routines
-GLCD_cnt_l:   ds 1   ; reserve 1 byte for variable GLCD_cnt_l
-GLCD_cnt_h:   ds 1   ; reserve 1 byte for variable GLCD_cnt_h
-GLCD_cnt_ms:  ds 1   ; reserve 1 byte for ms counter
-GLCD_tmp:	    ds 1   ; reserve 1 byte for temporary use
-GLCD_counter: ds 1   ; reserve 1 byte for variable GLCD_counter
+GLCD_cnt_l:	ds  1   ; reserve 1 byte for variable GLCD_cnt_l
+GLCD_cnt_h:	ds  1   ; reserve 1 byte for variable GLCD_cnt_h
+GLCD_cnt_ms:	ds  1   ; reserve 1 byte for ms counter
+GLCD_tmp:	ds  1   ; reserve 1 byte for temporary use
+GLCD_counter:	ds  1   ; reserve 1 byte for variable GLCD_counter
+GLCD_DATA:	ds  1	; Data Line Temporary Storage
+GLCD_CTRL:	ds  1	; Control Line Temporary Storage
 ; These variables are for other modules
 
 
 psect	uart_code,class=CODE
 
 GLCD_Setup:
-	clrf	LATD, A
-	clrf	LATB, A
-	clrf	TRISD, A
-	clrf	TRISB, A
-	;Turn on the 2 displays
-	movlw	0x01
-	call	GLCD_delay_x4us
+	clrf	LATD, A	    ;clear the data lines
+	clrf	LATB, A	    ;clear the control lines. Reset low Enable High
+	;setting Reset to low turn off the display
+	;start line set to 0
+	clrf	TRISD, A    ;configure PORTD as output
+	clrf	TRISB, A    ;configure PORTB as output
+	movlw	0x05
+	call	GLCD_delay_x4us	;delay 20 microseconds for prudence
 	movlw	00100000B   ;set Reset to high and Enable to low
 	movwf	LATB, A
-	movlw	00100001B
-	movwf	LATB, A	    ;control ready
-	movlw	00111111B
-	movwf	LATD, A	    ;data ready
-	nop
-	nop
-	nop
-	nop
-	bsf	LATB, 4, A  ; Enable
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	bcf	LATB, 4, A  ;set Enable to low
-	movlw	00100010B
-	movwf	LATB, A	    ;control Ready
-	movlw	00111111B
-	movwf	LATD, A	    ;data ready
-	nop
-	nop
-	nop
-	nop
-	bsf	LATB, 4, A  ;Enable
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	bcf	LATB, 4, A  ;set Enable to low	
-	clrf	LATD, A
-	movlw	00100000B
-	movwf	LATB, A
-	;Read Status
+	return
+
+GLCD_Read_Status:
 	setf	TRISD, A
+	movlw	0x05
+	call	GLCD_delay_x4us	;delay 20 microseconds
+	bcf	LATB, 4, A	;Set Enable to Low
 	movlw	00101001B
 	movwf	LATB, A
 	nop
@@ -73,27 +42,7 @@ GLCD_Setup:
 	nop
 	nop
 	nop
-	nop
-	bsf	LATB, 4, A  ;Enable
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	movf	PORTD, W, A
-	bcf	LATB, 4, A
-	movlw	00100010B   ;select y
-	movwf	LATB
-	movlw	01010000B
-	movwf	LATD
-	nop
-	nop
-	nop
-	nop
-	bsf	LATB, 4, A  ;Enable
+	bsf	LATB, 4, A	;Enable
 	nop
 	nop
 	nop
@@ -102,45 +51,10 @@ GLCD_Setup:
 	nop
 	nop
 	nop
-	bcf	LATB, 4, A
-	movlw	00100010B   ;select x
-	movwf	LATB
-	movlw	10111011B
-	movwf	LATD
-	nop
-	nop
-	nop
-	nop
-	bsf	LATB, 4, A  ;Enable
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	bcf	LATB, 4, A
-	movlw	00100110B   ;write display data
-	movwf	LATB
-	movlw	11001111B
-	movwf	LATD
-	nop
-	nop
-	nop
-	nop
-	bsf	LATB, 4, A  ;Enable
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	bcf	LATB, 4, A
+	movf	PORTD, W, A	;Read from PORTD the STATUS
+	bcf	LATB, 4, A	;Set Enable to Low
 	return
-
+	
 GLCD_Select_y1:
 	bcf	LATB, 4, A  ;Set Enable Low
 	addlw	01000000B   ;6-bit Y Address (bit 0-5) in WREG, Add bit 6-7
@@ -168,6 +82,71 @@ GLCD_Select_y2:
 	addlw	01000000B   ;6-bit Y Address (bit 0-5) in WREG, Add bit 6-7
 	movwf	LATD	    ;data line
 	movlw	00100001B   ;Y Select Instruction, Segmant 65-128 Selected
+	movwf	LATB	    ;control line
+	nop
+	nop
+	nop
+	nop		    ;500ns from Set Enable Low
+	bsf	LATB, 4, A  ;Set Enable High. Low to High transition occur
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop		    ;500ns from Set Enable High
+	bcf	LATB, 4, A  ;Set Enable Low.  High to Low transition occur
+	return
+
+GLCD_Select_x1:
+	bcf	LATB, 4, A  ;Set Enable Low
+	addlw	10111000B   ;3-bit X Address (bit 0-2) in WREG, Add bit 3-7
+	movwf	LATD	    ;data line
+	movlw	00100010B   ;X Select Instruction, Segmant 1-64 Selected
+	movwf	LATB	    ;control line
+	nop
+	nop
+	nop
+	nop		    ;500ns from Set Enable Low
+	bsf	LATB, 4, A  ;Set Enable High. Low to High transition occur
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop		    ;500ns from Set Enable High
+	bcf	LATB, 4, A  ;Set Enable Low.  High to Low transition occur
+	return
+
+GLCD_Select_x2:
+	bcf	LATB, 4, A  ;Set Enable Low
+	addlw	10111000B   ;3-bit X Address (bit 0-2) in WREG, Add bit 3-7
+	movwf	LATD	    ;data line
+	movlw	00100001B   ;X Select Instruction, Segmant 1-64 Selected
+	movwf	LATB	    ;control line
+	nop
+	nop
+	nop
+	nop		    ;500ns from Set Enable Low
+	bsf	LATB, 4, A  ;Set Enable High. Low to High transition occur
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop		    ;500ns from Set Enable High
+	bcf	LATB, 4, A  ;Set Enable Low.  High to Low transition occur
+	return
+
+GLCD_Write_Display1:
+	bcf	LATB, 4, A  ;Set Enable Low
+	movwf	LATD	    ;Display Data in WREG, move to data line
+	movlw	00100110B   ;Write Display Instruction, Segmant 1-64 Selected
 	movwf	LATB	    ;control line
 	nop
 	nop
