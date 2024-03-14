@@ -74,7 +74,7 @@ y_select:
 	movlw	0x00
 	call	GLCD_Select_y1
 	movlw	0x00
-	call	GLCD_Select_y1
+	call	GLCD_Select_y2
 write_zeros:
 	movlw	0x00
 	call	GLCD_Write_Display1
@@ -111,21 +111,11 @@ GLCD_Read_Status:
 	bcf	LATB, 4, A	;Set Enable to Low
 	movlw	00101010B
 	movwf	LATB, A
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bsf	LATB, 4, A	;Enable
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
+	movlw	0x01
+	call	GLCD_delay_x4us
 	movf	PORTD, W, A	;Read from PORTD the STATUS
 	movwf	GLCD_STATUS, A	;Put ststus in global GLCD_STATUS 
 	bcf	LATB, 4, A	;Set Enable to Low
@@ -214,19 +204,11 @@ GLCD_Select_y2:
 	movwf	LATD	    ;data line
 	movlw	00100001B   ;Y Select Instruction, Segmant 65-128 Selected
 	movwf	LATB	    ;control line
-	nop
-	nop
-	nop
-	nop		    ;500ns from Set Enable Low
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bsf	LATB, 4, A  ;Set Enable High. Low to High transition occur
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop		    ;500ns from Set Enable High
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bcf	LATB, 4, A  ;Set Enable Low.  High to Low transition occur
 	return
 
@@ -250,19 +232,11 @@ GLCD_Select_x2:
 	movwf	LATD	    ;data line
 	movlw	00100001B   ;X Select Instruction, Segmant 1-64 Selected
 	movwf	LATB	    ;control line
-	nop
-	nop
-	nop
-	nop		    ;500ns from Set Enable Low
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bsf	LATB, 4, A  ;Set Enable High. Low to High transition occur
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop		    ;500ns from Set Enable High
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bcf	LATB, 4, A  ;Set Enable Low.  High to Low transition occur
 	return
 
@@ -284,19 +258,11 @@ GLCD_Write_Display2:
 	movwf	LATD	    ;Display Data in WREG, move to data line
 	movlw	00100101B   ;Write Display Instruction, Segmant 65-128 Selected
 	movwf	LATB	    ;control line
-	nop
-	nop
-	nop
-	nop		    ;500ns from Set Enable Low
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bsf	LATB, 4, A  ;Set Enable High. Low to High transition occur
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop		    ;500ns from Set Enable High
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bcf	LATB, 4, A  ;Set Enable Low.  High to Low transition occur
 	return
     
