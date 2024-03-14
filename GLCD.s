@@ -35,15 +35,22 @@ GLCD_Setup:
 	movlw	0x02
 	call	GLCD_delay_ms	;delay 2 miliseconds for prudence
 	call	GLCD_ON1
+	call	GLCD_ON2
+	nop
+	call	GLCD_ZERO_INIT
 	nop
 	movlw	0x00
 	call	GLCD_Select_x1
-	movlw	0x00
+	movlw	00111111B
 	call	GLCD_Select_y1
-	movlw	11110000B
+	movlw	01010101B
 	call	GLCD_Write_Display1
-	nop
-	call	GLCD_ZERO_INIT
+	movlw	0x00
+	call	GLCD_Select_x2
+	movlw	00000000B
+	call	GLCD_Select_y2
+	movlw	01010101B
+	call	GLCD_Write_Display2
 	nop
 	call	GLCD_OFF1
 	nop
@@ -61,12 +68,18 @@ GLCD_ZERO_INIT:
 page_select:
 	movf	GLCD_XLOC, W, A
 	call	GLCD_Select_x1
+	movf	GLCD_XLOC, W, A
+	call	GLCD_Select_x2
 y_select:
+	movlw	0x00
+	call	GLCD_Select_y1
 	movlw	0x00
 	call	GLCD_Select_y1
 write_zeros:
 	movlw	0x00
 	call	GLCD_Write_Display1
+	movlw	0x00
+	call	GLCD_Write_Display2
 	incf	GLCD_YLOC, A
 	decfsz	GLCD_CounterY, A
 	bra	write_zeros
@@ -83,19 +96,11 @@ GLCD_START_LINE_AT_ZERO1:
 	movwf	LATB, A
 	movlw	11000000B
 	movwf	LATD, A
-	nop
-	nop
-	nop
-	nop
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bsf	LATB, 4, A
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bcf	LATB, 4, A
 	return
 
@@ -136,19 +141,11 @@ GLCD_ON1:
 	movwf	LATB, A
 	movlw	00111111B
 	movwf	LATD, A
-	nop
-	nop
-	nop
-	nop
+	movlw	0x05
+	call	GLCD_delay_x4us
 	bsf	LATB, 4, A
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bcf	LATB, 4, A
 	return
 
@@ -159,19 +156,11 @@ GLCD_ON2:
 	movwf	LATB, A
 	movlw	00111111B
 	movwf	LATD, A
-	nop
-	nop
-	nop
-	nop
+	movlw	0x05
+	call	GLCD_delay_x4us
 	bsf	LATB, 4, A
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bcf	LATB, 4, A
 	return
 
@@ -182,19 +171,11 @@ GLCD_OFF1:
 	movwf	LATB, A
 	movlw	00111110B
 	movwf	LATD, A
-	nop
-	nop
-	nop
-	nop
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bsf	LATB, 4, A
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bcf	LATB, 4, A
 	return
 
@@ -205,19 +186,11 @@ GLCD_OFF2:
 	movwf	LATB, A
 	movlw	00111110B
 	movwf	LATD, A
-	nop
-	nop
-	nop
-	nop
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bsf	LATB, 4, A
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bcf	LATB, 4, A
 	return
 
