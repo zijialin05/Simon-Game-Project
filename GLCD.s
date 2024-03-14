@@ -32,15 +32,15 @@ GLCD_Setup:
 	;start line set to 0
 	clrf	TRISD, A    ;configure PORTD as output
 	clrf	TRISB, A    ;configure PORTB as output
-	movlw	0x05
-	call	GLCD_delay_x4us	;delay 20 microseconds for prudence
+	movlw	0x02
+	call	GLCD_delay_ms	;delay 2 miliseconds for prudence
 	call	GLCD_ON1
 	nop
 	movlw	0x00
 	call	GLCD_Select_x1
 	movlw	0x00
 	call	GLCD_Select_y1
-	movlw	00001111B
+	movlw	11110000B
 	call	GLCD_Write_Display1
 	nop
 	call	GLCD_ZERO_INIT
@@ -227,19 +227,11 @@ GLCD_Select_y1:
 	movwf	LATD	    ;data line
 	movlw	00100010B   ;Y Select Instruction, Segmant 1-64 Selected
 	movwf	LATB	    ;control line
-	nop
-	nop
-	nop
-	nop		    ;500ns from Set Enable Low
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bsf	LATB, 4, A  ;Set Enable High. Low to High transition occur
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop		    ;500ns from Set Enable High
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bcf	LATB, 4, A  ;Set Enable Low.  High to Low transition occur
 	return
 
@@ -271,19 +263,11 @@ GLCD_Select_x1:
 	movwf	LATD	    ;data line
 	movlw	00100010B   ;X Select Instruction, Segmant 1-64 Selected
 	movwf	LATB	    ;control line
-	nop
-	nop
-	nop
-	nop		    ;500ns from Set Enable Low
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bsf	LATB, 4, A  ;Set Enable High. Low to High transition occur
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop		    ;500ns from Set Enable High
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bcf	LATB, 4, A  ;Set Enable Low.  High to Low transition occur
 	return
 
@@ -314,19 +298,11 @@ GLCD_Write_Display1:
 	movwf	LATD	    ;Display Data in WREG, move to data line
 	movlw	00100110B   ;Write Display Instruction, Segmant 1-64 Selected
 	movwf	LATB	    ;control line
-	nop
-	nop
-	nop
-	nop		    ;500ns from Set Enable Low
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bsf	LATB, 4, A  ;Set Enable High. Low to High transition occur
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop		    ;500ns from Set Enable High
+	movlw	0x01
+	call	GLCD_delay_x4us
 	bcf	LATB, 4, A  ;Set Enable Low.  High to Low transition occur
 	return
 
