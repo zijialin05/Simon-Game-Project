@@ -12,7 +12,6 @@ int_hi:	org	0x0008	; high vector, no low vector
 	
 start:	movlw	0x00
 	call	GLCD_Setup
-	call	GLCD_Read_Status
 	call	OUT_1
 	movlw	0x00
 	call	DAC_Setup

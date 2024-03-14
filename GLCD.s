@@ -4,6 +4,7 @@ global  GLCD_Setup
 global	GLCD_Select_y1, GLCD_Select_y2, GLCD_Select_x1, GLCD_Select_x2
 global	GLCD_Write_Display1, GLCD_Write_Display2, GLCD_Read_Status
 global	GLCD_ON1, GLCD_ON2, GLCD_OFF1, GLCD_OFF2, GLCD_STATUS
+global	GLCD_YLOC, GLCD_XLOC, GLCD_CounterY, GLCD_CounterX
 
 psect	udata_acs   ; reserve data space in access ram
 ; The first few variables are for the delay routines
@@ -15,6 +16,10 @@ GLCD_counter:	ds  1   ; reserve 1 byte for variable GLCD_counter
 GLCD_DATA:	ds  1	; Data Line Temporary Storage
 GLCD_CTRL:	ds  1	; Control Line Temporary Storage
 GLCD_STATUS:	ds  1	; Result returned from Status
+GLCD_CounterY:	ds  1
+GLCD_CounterX:	ds  1
+GLCD_YLOC:	ds  1
+GLCD_XLOC:	ds  1
 ; These variables are for other modules
 
 
@@ -29,8 +34,69 @@ GLCD_Setup:
 	clrf	TRISB, A    ;configure PORTB as output
 	movlw	0x05
 	call	GLCD_delay_x4us	;delay 20 microseconds for prudence
+	call	GLCD_ON1
+	nop
+	movlw	0x00
+	call	GLCD_Select_x1
+	movlw	0x00
+	call	GLCD_Select_y1
+	movlw	00001111B
+	call	GLCD_Write_Display1
+	nop
+	call	GLCD_ZERO_INIT
+	nop
+	call	GLCD_OFF1
+	nop
 	movlw	00100000B   ;set Reset to high and Enable to low
 	movwf	LATB, A
+	return
+
+GLCD_ZERO_INIT:
+	movlw	00111111B
+	movwf	GLCD_CounterY, A
+	movlw	00000111B
+	movwf	GLCD_CounterX, A
+	clrf	GLCD_YLOC, A
+	clrf	GLCD_XLOC, A
+page_select:
+	movf	GLCD_XLOC, W, A
+	call	GLCD_Select_x1
+y_select:
+	movlw	0x00
+	call	GLCD_Select_y1
+write_zeros:
+	movlw	0x00
+	call	GLCD_Write_Display1
+	incf	GLCD_YLOC, A
+	decfsz	GLCD_CounterY, A
+	bra	write_zeros
+	incf	GLCD_XLOC, A
+	movlw	00000111B
+	cpfsgt	GLCD_XLOC, A
+	bra	page_select
+	return
+
+GLCD_START_LINE_AT_ZERO1:
+	movlw	00100000B
+	movwf	LATB, A
+	movlw	00100010B
+	movwf	LATB, A
+	movlw	11000000B
+	movwf	LATD, A
+	nop
+	nop
+	nop
+	nop
+	bsf	LATB, 4, A
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	bcf	LATB, 4, A
 	return
 
 GLCD_Read_Status:
@@ -64,7 +130,8 @@ GLCD_Read_Status:
 	return
 
 GLCD_ON1:
-	bcf	LATB, 4, A  ;Set Enable Low
+	movlw	00100000B
+	movwf	LATB, A
 	movlw	00100010B
 	movwf	LATB, A
 	movlw	00111111B
@@ -86,7 +153,8 @@ GLCD_ON1:
 	return
 
 GLCD_ON2:
-	bcf	LATB, 4, A  ;Set Enable Low
+	movlw	00100000B
+	movwf	LATB, A
 	movlw	00100001B
 	movwf	LATB, A
 	movlw	00111111B
@@ -108,7 +176,8 @@ GLCD_ON2:
 	return
 
 GLCD_OFF1:
-	bcf	LATB, 4, A  ;Set Enable Low
+	movlw	00100000B
+	movwf	LATB, A
 	movlw	00100010B
 	movwf	LATB, A
 	movlw	00111110B
@@ -130,7 +199,8 @@ GLCD_OFF1:
 	return
 
 GLCD_OFF2:
-	bcf	LATB, 4, A  ;Set Enable Low
+	movlw	00100000B
+	movwf	LATB, A
 	movlw	00100001B
 	movwf	LATB, A
 	movlw	00111110B
