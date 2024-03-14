@@ -36,24 +36,7 @@ GLCD_Setup:
 	call	GLCD_delay_ms	;delay 2 miliseconds for prudence
 	call	GLCD_ON1
 	call	GLCD_ON2
-	nop
 	call	GLCD_ZERO_INIT
-	nop
-	movlw	0x00
-	call	GLCD_Select_x1
-	movlw	00111111B
-	call	GLCD_Select_y1
-	movlw	01010101B
-	call	GLCD_Write_Display1
-	movlw	0x00
-	call	GLCD_Select_x2
-	movlw	00000000B
-	call	GLCD_Select_y2
-	movlw	01010101B
-	call	GLCD_Write_Display2
-	nop
-	call	GLCD_OFF1
-	nop
 	movlw	00100000B   ;set Reset to high and Enable to low
 	movwf	LATB, A
 	return
