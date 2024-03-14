@@ -1,8 +1,9 @@
 #include <xc.inc>
     
-global  GLCD_Setup
+global  GLCD_Setup, OUT_1
 extrn	GLCD_Select_y1, GLCD_Select_y2, GLCD_Select_x1, GLCD_Select_x2
-extrn	GLCD_Write_Display1, GLCD_Write_Display2
+extrn	GLCD_Write_Display1, GLCD_Write_Display2, GLCD_Read_Status
+extrn	GLCD_ON1, GLCD_ON2, GLCD_OFF1, GLCD_OFF2
 
 
 psect	uart_code,class=CODE
@@ -118,6 +119,13 @@ OUT_1:	;write the bitmap to fixed position one byte by one byte
 	call	GLCD_Select_x1		;2nd byte
 	movlw	11100000B
 	call	GLCD_Write_Display1
+	call	GLCD_ON1
+	movlw	0x00
+	call	GLCD_Read_Status
+	movlw	0x00
+	call	GLCD_OFF1
+	movlw	0x00
+	movlw	0x00
 	return
 	
 	

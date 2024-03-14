@@ -2,7 +2,8 @@
     
 global  GLCD_Setup
 global	GLCD_Select_y1, GLCD_Select_y2, GLCD_Select_x1, GLCD_Select_x2
-global	GLCD_Write_Display1, GLCD_Write_Display2
+global	GLCD_Write_Display1, GLCD_Write_Display2, GLCD_Read_Status
+global	GLCD_ON1, GLCD_ON2, GLCD_OFF1, GLCD_OFF2, GLCD_STATUS
 
 psect	udata_acs   ; reserve data space in access ram
 ; The first few variables are for the delay routines
@@ -13,6 +14,7 @@ GLCD_tmp:	ds  1   ; reserve 1 byte for temporary use
 GLCD_counter:	ds  1   ; reserve 1 byte for variable GLCD_counter
 GLCD_DATA:	ds  1	; Data Line Temporary Storage
 GLCD_CTRL:	ds  1	; Control Line Temporary Storage
+GLCD_STATUS:	ds  1	; Result returned from Status
 ; These variables are for other modules
 
 
@@ -36,7 +38,7 @@ GLCD_Read_Status:
 	movlw	0x05
 	call	GLCD_delay_x4us	;delay 20 microseconds
 	bcf	LATB, 4, A	;Set Enable to Low
-	movlw	00101001B
+	movlw	00101010B
 	movwf	LATB, A
 	nop
 	nop
@@ -54,12 +56,101 @@ GLCD_Read_Status:
 	nop
 	nop
 	movf	PORTD, W, A	;Read from PORTD the STATUS
+	movwf	GLCD_STATUS, A	;Put ststus in global GLCD_STATUS 
 	bcf	LATB, 4, A	;Set Enable to Low
 	clrf	TRISD, A	;Set to all output
 	movlw	0x05
 	call	GLCD_delay_x4us	;delay 20 microseconds
 	return
-	
+
+GLCD_ON1:
+	bcf	LATB, 4, A  ;Set Enable Low
+	movlw	00100010B
+	movwf	LATB, A
+	movlw	00111111B
+	movwf	LATD, A
+	nop
+	nop
+	nop
+	nop
+	bsf	LATB, 4, A
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	bcf	LATB, 4, A
+	return
+
+GLCD_ON2:
+	bcf	LATB, 4, A  ;Set Enable Low
+	movlw	00100001B
+	movwf	LATB, A
+	movlw	00111111B
+	movwf	LATD, A
+	nop
+	nop
+	nop
+	nop
+	bsf	LATB, 4, A
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	bcf	LATB, 4, A
+	return
+
+GLCD_OFF1:
+	bcf	LATB, 4, A  ;Set Enable Low
+	movlw	00100010B
+	movwf	LATB, A
+	movlw	00111110B
+	movwf	LATD, A
+	nop
+	nop
+	nop
+	nop
+	bsf	LATB, 4, A
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	bcf	LATB, 4, A
+	return
+
+GLCD_OFF2:
+	bcf	LATB, 4, A  ;Set Enable Low
+	movlw	00100001B
+	movwf	LATB, A
+	movlw	00111110B
+	movwf	LATD, A
+	nop
+	nop
+	nop
+	nop
+	bsf	LATB, 4, A
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	bcf	LATB, 4, A
+	return
+
 GLCD_Select_y1:
 	bcf	LATB, 4, A  ;Set Enable Low
 	addlw	01000000B   ;6-bit Y Address (bit 0-5) in WREG, Add bit 6-7
