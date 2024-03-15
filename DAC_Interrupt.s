@@ -2,7 +2,11 @@
 	
 global	DAC_Setup, DAC_Int_Hi, Trial_Int_Hi, LFSR_Step
 psect	udata_acs
-counter:    ds	1
+counter:	ds  1
+Sound_IntL:	ds  1	;low byte for Interval
+Sound_IntH:	ds  1	;high byte for Interval
+Sound_Dur:	ds  1	;Duration
+STEMP:		ds  1	;Temp registor for sound
 
 psect	udata_bank4
 myArray:    ds	0x80
@@ -46,6 +50,159 @@ Trial_Int_Hi:
 	movwf	TMR0L, A
 	bsf	TMR0IE		; Enable timer0 interrupt
 	retfie	f
+
+Sound_Var_Setup:
+	movwf	STEMP, A
+	movf	STEMP, W, A
+	btfsc   STATUS, 2
+	bra	E4
+	movf	STEMP, W, A
+	sublw   0x01
+	btfsc   STATUS, 2
+	bra	C3
+	movf	STEMP, W, A
+	sublw   0x02
+	btfsc   STATUS, 2
+	bra	D3
+	movf	STEMP, W, A
+	sublw   0x03
+	btfsc   STATUS, 2
+	bra	E3
+	movf	STEMP, W, A
+	sublw   0x04
+	btfsc   STATUS, 2
+	bra	F3
+	movf	STEMP, W, A
+	sublw   0x05
+	btfsc   STATUS, 2
+	bra	G3
+	movf	STEMP, W, A
+	sublw   0x06
+	btfsc   STATUS, 2
+	bra	A3
+	movf	STEMP, W, A
+	sublw   0x07
+	btfsc   STATUS, 2
+	bra	B3
+	movf	STEMP, W, A
+	sublw   0x08
+	btfsc   STATUS, 2
+	bra	C4
+	movf	STEMP, W, A
+	sublw   0x09
+	btfsc   STATUS, 2
+	bra	D4
+	movf	STEMP, W, A
+	sublw   0x0C
+	btfsc   STATUS, 2
+	bra	E4
+	movf	STEMP, W, A
+	sublw   0x0D
+	btfsc   STATUS, 2
+	bra	F4
+	movf	STEMP, W, A
+	sublw   0x0E
+	btfsc   STATUS, 2
+	bra	G4
+	movf	STEMP, W, A
+	sublw   0x0F
+	btfsc   STATUS, 2
+	bra	A4
+C3:	movlw	0x50
+	movwf	Sound_IntL, A
+	movlw	0xFC
+	movwf	Sound_IntH, A
+	movlw	0x41
+	movwf	Sound_Dur, A
+	return
+D3:	movlw	0xB9
+	movwf	Sound_IntL, A
+	movlw	0xFC
+	movwf	Sound_IntH, A
+	movlw	0x49
+	movwf	Sound_Dur, A
+	return
+E3:	movlw	0x16
+	movwf	Sound_IntL, A
+	movlw	0xFD
+	movwf	Sound_IntH, A
+	movlw	0x52
+	movwf	Sound_Dur, A
+	return
+F3:	movlw	0x40
+	movwf	Sound_IntL, A
+	movlw	0xFD
+	movwf	Sound_IntH, A
+	movlw	0x57
+	movwf	Sound_Dur, A
+	return
+G3:	movlw	0x8E
+	movwf	Sound_IntL, A
+	movlw	0xFD
+	movwf	Sound_IntH, A
+	movlw	0x62
+	movwf	Sound_Dur, A
+	return
+A3:	movlw	0xD4
+	movwf	Sound_IntL, A
+	movlw	0xFD
+	movwf	Sound_IntH, A
+	movlw	0x6E
+	movwf	Sound_Dur, A
+	return
+B3:	movlw	0x12
+	movwf	Sound_IntL, A
+	movlw	0xFE
+	movwf	Sound_IntH, A
+	movlw	0x7B
+	movwf	Sound_Dur, A
+	return
+C4:	movlw	0x2E
+	movwf	Sound_IntL, A
+	movlw	0xFE
+	movwf	Sound_IntH, A
+	movlw	0x83
+	movwf	Sound_Dur, A
+	return
+D4:	movlw	0x62
+	movwf	Sound_IntL, A
+	movlw	0xFE
+	movwf	Sound_IntH, A
+	movlw	0x93
+	movwf	Sound_Dur, A
+	return
+E4:	movlw	0x91
+	movwf	Sound_IntL, A
+	movlw	0xFE
+	movwf	Sound_IntH, A
+	movlw	0xA5
+	movwf	Sound_Dur, A
+	return
+F4:	movlw	0xA6
+	movwf	Sound_IntL, A
+	movlw	0xFE
+	movwf	Sound_IntH, A
+	movlw	0xAF
+	movwf	Sound_Dur, A
+	return
+G4:	movlw	0xCD
+	movwf	Sound_IntL, A
+	movlw	0xFE
+	movwf	Sound_IntH, A
+	movlw	0xC4
+	movwf	Sound_Dur, A
+	return
+A4:	movlw	0xF0
+	movwf	Sound_IntL, A
+	movlw	0xFE
+	movwf	Sound_IntH, A
+	movlw	0xDC
+	movwf	Sound_Dur, A
+	return
+
+Sound_Setup:
+	call	Sound_Var_Setup
+	
 	
 DAC_Int_Hi:	
 	btfss	TMR0IF		; check that this is timer0 interrupt

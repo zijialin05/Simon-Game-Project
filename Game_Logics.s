@@ -5,7 +5,7 @@ global	GEN_RAND_SEQ, FSR0L, FSR0H, COUNTER, INPUT_SEQ, GENSEQ, INPTSEQ
 global	Game_Setup, LFSR_Load_Seed
 
 extrn	KP_Change, KPPrev, KPOWC, KP_ASCII_TO_VAL, KP_Setup, GLCD_Setup
-extrn	KP_DOWC
+extrn	KP_DOWC, GLCD_delay_ms
 
 psect	udata_bank5
 GENSEQ:	    ds	0x80
@@ -19,6 +19,7 @@ OUT:	    ds	1
 RESULT:	    ds	1
 COUNTER:    ds	1
 INPUTCHAR:  ds	1
+SCORE_1:    ds	1
 
 psect	uart_code,class=CODE
 
@@ -26,6 +27,19 @@ Game_Setup:
     call    KP_Setup
     call    GLCD_Setup
     call    LFSR_Setup
+    return
+
+GAME_START:
+    call    Game_Setup
+    movlw   0xFF
+    call    GLCD_delay_ms
+    call    KP_DOWC
+GAME_SESSION:
+    call    LFSR_Load_Seed
+    clrf    SCORE_1, A
+GAME_ROUND:
+    call    GEN_RAND_SEQ
+    call    INPUT_SEQ		;Not Finished Yet
     return
 
 LFSR_Setup:

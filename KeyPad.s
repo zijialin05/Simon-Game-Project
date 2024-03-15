@@ -158,6 +158,22 @@ KP_ASCII_TO_VAL:
     sublw   '9'
     btfsc   STATUS, 2
     retlw   0x09
+    movf    KPASCII, W, A
+    sublw   'C'
+    btfsc   STATUS, 2
+    retlw   0x0C
+    movf    KPASCII, W, A
+    sublw   'D'
+    btfsc   STATUS, 2
+    retlw   0x0D
+    movf    KPASCII, W, A
+    sublw   'E'
+    btfsc   STATUS, 2
+    retlw   0x0E
+    movf    KPASCII, W, A
+    sublw   'F'
+    btfsc   STATUS, 2
+    retlw   0x0F
     retlw   0x3f
     return
     
