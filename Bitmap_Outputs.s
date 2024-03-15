@@ -288,9 +288,9 @@ OUT_3:
 
 CLR_3:
 	movlw 0x05
-	call GLCD_Select_y1
+	call GLCD_Select_y2
 	movlw 0x00
-	call GLCD_Select_x1
+	call GLCD_Select_x2
 	movlw 00000000B
 	call GLCD_Write_Display2
 	movlw 00000000B
@@ -306,9 +306,9 @@ CLR_3:
 	
 	
 	movlw 0x05
-	call GLCD_Select_y1
+	call GLCD_Select_y2
 	movlw 0x01
-	call GLCD_Select_x1
+	call GLCD_Select_x2
 	movlw 00000000B
 	call GLCD_Write_Display2
 	movlw 00000000B

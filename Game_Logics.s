@@ -132,23 +132,21 @@ LFSR_RANDINT:
 
 OUTPUT_GEN_SEQ:
     movwf   COUNTER, A
-    LFSR    0, GENSEQ
-    movlw   0x3f
-    movwf   OUTPrev, A
-    clrf    OUTCurr, A
+    LFSR    1, GENSEQ
 Out_Char:
-    movf    INDF0, W, A
+    movf    INDF1, W, A
+    movwf   OUTCurr, A
     call    Sound_Setup
-    movf    INDF0, W, A
+    movf    OUTCurr, W, A
     call    Output_Bitmap
     movlw   0xFF
     call    GLCD_delay_ms
     movlw   0xFF
     call    GLCD_delay_ms
-    movf    INDF0, W, A
+    movf    INDF1, W, A
     call    Clear_Bitmap
-    INFSNZ  FSR0L, F, A
-    INCF    FSR0H, F, A
+    INFSNZ  FSR1L, F, A
+    INCF    FSR1H, F, A
     decfsz  COUNTER, A
     bra	    Out_Char
     return
