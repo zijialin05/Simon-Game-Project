@@ -1,12 +1,14 @@
 #include <xc.inc>
 	
-global	DAC_Setup, DAC_Int_Hi, Trial_Int_Hi, LFSR_Step
+global	DAC_Setup, DAC_Int_Hi, Trial_Int_Hi, LFSR_Step, Sound_Setup
+global	Sound_Int_Hi
 psect	udata_acs
-counter:	ds  1
-Sound_IntL:	ds  1	;low byte for Interval
-Sound_IntH:	ds  1	;high byte for Interval
-Sound_Dur:	ds  1	;Duration
-STEMP:		ds  1	;Temp registor for sound
+counter:	    ds  1
+Sound_IntL:	    ds  1	;low byte for Interval
+Sound_IntH:	    ds  1	;high byte for Interval
+Sound_Dur:	    ds  1	;Duration
+STEMP:		    ds  1	;Temp registor for sound
+SOUND_TERMINATE:    ds	1
 
 psect	udata_bank4
 myArray:    ds	0x80
@@ -200,16 +202,12 @@ A4:	movlw	0xF0
 	movwf	Sound_Dur, A
 	return
 
-Sound_Setup:
-	call	Sound_Var_Setup
-	
-	
-DAC_Int_Hi:	
+Sound_Int_Hi:
 	btfss	TMR0IF		; check that this is timer0 interrupt
 	retfie	f		; if not then return
-	movlw	0xFE
+	movf	Sound_IntH, W, A
 	movwf	TMR0H, A
-	movlw	0xCD
+	movf	Sound_IntL, W, A
 	movwf	TMR0L, A
 	movlw	0x00
 	movwf	LATH
@@ -217,15 +215,97 @@ DAC_Int_Hi:
 	movff	TABLAT, LATJ
 	movlw	0xFF
 	movwf	LATH
-	decfsz	counter, A
+	decf	counter, A
+	movf	counter, W, A
+	btfsc	STATUS, 2
+	call	Sound_RST
+	bcf	TMR0IF		; clear interrupt flag
+	bsf	TMR0IE		; Enable timer0 interrupt
+	btfsc	SOUND_TERMINATE, 0, A
+	call	Terminate
+	retfie	f		; fast return from interrupt
+Terminate:
+	movlw   00001000B
+	movwf   T0CON, A
+	bcf	TMR0IE
+	return
+
+Sound_RST:
+	dcfsnz	Sound_Dur, A
+	setf	SOUND_TERMINATE, A
+	lfsr	0, myArray
+	movlw	low highword(myTable)
+	movwf	TBLPTRU, A
+	movlw	high(myTable)
+	movwf	TBLPTRH, A
+	movlw	low(myTable)
+	movwf	TBLPTRL, A
+	movlw	myTable_1
+	movwf	counter, A
+	return
+
+Sound_Setup:
+	call	Sound_Var_Setup
+	clrf	TRISJ, A	; Set PORTD as all outputs
+	clrf	TRISH, A
+	clrf	LATJ, A		; Clear PORTD outputs
+	movlw	0xFF
+	movwf	LATH, A
+	clrf	SOUND_TERMINATE, A
+	lfsr	0, myArray
+	movlw	low highword(myTable)
+	movwf	TBLPTRU, A
+	movlw	high(myTable)
+	movwf	TBLPTRH, A
+	movlw	low(myTable)
+	movwf	TBLPTRL, A
+	movlw	myTable_1
+	movwf	counter, A
+	movlw	10001000B	; Set timer0 to 16-bit, Fosc/4/256
+	movwf	T0CON, A	; = 62.5KHz clock rate, approx 1sec rollover
+	bsf	TMR0IE		; Enable timer0 interrupt
+	bsf	GIE		; Enable all interrupts
+	bcf	CFGS
+	bsf	EEPGD
+	return
+
+	
+DAC_Int_Hi:	
+	btfss	TMR0IF		; check that this is timer0 interrupt
+	retfie	f		; if not then return
+	movf	Sound_IntH, W, A
+	movwf	TMR0H, A
+	movf	Sound_IntL, W, A
+	movwf	TMR0L, A
+	movlw	0x00
+	movwf	LATH
+	
+	tblrd*+
+	movff	TABLAT, LATJ
+	movlw	0xFF
+	movwf	LATH
+	decf	counter, A
 	movf	counter, W, A
 	btfsc	STATUS, 2
 	call	RST
 	bcf	TMR0IF		; clear interrupt flag
 	bsf	TMR0IE		; Enable timer0 interrupt
+	btfsc	SOUND_TERMINATE, 0, A
+	call	DAC_Terminate
 	retfie	f		; fast return from interrupt
+DAC_Terminate:
+	movlw   00000000B
+	movwf   T0CON, A
+	return
 
 DAC_Setup:
+	movlw	0x50
+	movwf	Sound_IntL, A
+	movlw	0xFC
+	movwf	Sound_IntH, A
+	clrf	SOUND_TERMINATE, A
+	movlw	0xFF
+	movwf	Sound_Dur, A
 	clrf	TRISJ, A	; Set PORTD as all outputs
 	clrf	TRISH, A
 	clrf	LATJ, A		; Clear PORTD outputs
@@ -251,6 +331,8 @@ DAC_Setup:
 	return
 	
 RST:
+	dcfsnz	Sound_Dur, A
+	setf	SOUND_TERMINATE, A
 	lfsr	0, myArray
 	movlw	low highword(myTable)
 	movwf	TBLPTRU, A

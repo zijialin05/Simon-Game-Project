@@ -5,7 +5,7 @@ global	GEN_RAND_SEQ, FSR0L, FSR0H, COUNTER, INPUT_SEQ, GENSEQ, INPTSEQ
 global	Game_Setup, LFSR_Load_Seed
 
 extrn	KP_Change, KPPrev, KPOWC, KP_ASCII_TO_VAL, KP_Setup, GLCD_Setup
-extrn	KP_DOWC, GLCD_delay_ms
+extrn	KP_DOWC, GLCD_delay_ms, Sound_Setup
 
 psect	udata_bank5
 GENSEQ:	    ds	0x80
@@ -153,6 +153,8 @@ ONE_INPUT:
     sublw   0x3f
     btfsc   STATUS, 2
     bra	    ONE_INPUT
+    movf    INPUTCHAR, W, A
+    call    Sound_Setup
     movf    INPUTCHAR, W, A
     movwf   INDF1
     INFSNZ  FSR1L, F, A

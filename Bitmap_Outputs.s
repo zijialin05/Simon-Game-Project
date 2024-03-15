@@ -10,6 +10,9 @@ extrn	GLCD_ON1, GLCD_ON2, GLCD_OFF1, GLCD_OFF2
 
 psect	uart_code,class=CODE
 
+Output_Bitmap:
+	
+
 OUT_1:	;write the bitmap to fixed position one byte by one byte
 	movlw	0x05			;starting from line 5
 	call	GLCD_Select_y1
@@ -323,7 +326,7 @@ CLR_4:
 	return
 	
 OUT_5:
-	movlw	0x24			
+	movlw	0x25			
 	call	GLCD_Select_y1
 	movlw	0x02			
 	call	GLCD_Select_x1
@@ -342,7 +345,7 @@ OUT_5:
 	movlw	00000000B
 	call	GLCD_Write_Display1
 	
-	movlw	0x24			
+	movlw	0x25			
 	call	GLCD_Select_y1
 	movlw	0x03			
 	call	GLCD_Select_x1
@@ -363,7 +366,7 @@ OUT_5:
 	return 
     
 CLR_5:
-	movlw	0x24			
+	movlw	0x25			
 	call	GLCD_Select_y1
 	movlw	0x02			
 	call	GLCD_Select_x1
@@ -382,7 +385,7 @@ CLR_5:
 	movlw	00000000B
 	call	GLCD_Write_Display1
 	
-	movlw	0x24			
+	movlw	0x25			
 	call	GLCD_Select_y1
 	movlw	0x03			
 	call	GLCD_Select_x1
@@ -574,7 +577,7 @@ CLR_7:
 	return
 	
 OUT_8:
-	movlw	0x24			
+	movlw	0x25			
 	call	GLCD_Select_y1
 	movlw	0x04			
 	call	GLCD_Select_x1
@@ -591,7 +594,7 @@ OUT_8:
 	movlw	01110000B
 	call	GLCD_Write_Display1
 	
-	movlw	0x24			
+	movlw	0x25			
 	call	GLCD_Select_y1
 	movlw	0x05			
 	call	GLCD_Select_x1
@@ -610,7 +613,7 @@ OUT_8:
 	return
     
 CLR_8: 
-	movlw	0x24			
+	movlw	0x25			
 	call	GLCD_Select_y1
 	movlw	0x04			
 	call	GLCD_Select_x1
@@ -627,7 +630,7 @@ CLR_8:
 	movlw	00000000B
 	call	GLCD_Write_Display1
 	
-	movlw	0x24			
+	movlw	0x25			
 	call	GLCD_Select_y1
 	movlw	0x05			
 	call	GLCD_Select_x1
