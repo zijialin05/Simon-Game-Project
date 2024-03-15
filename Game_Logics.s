@@ -2,10 +2,10 @@
     
 global  LFSR_Step, LFSR_H, LFSR_L, TEMP, OUT, RESULT, LFSR_Load_Fixed_Seed
 global	GEN_RAND_SEQ, FSR0L, FSR0H, COUNTER, INPUT_SEQ, GENSEQ, INPTSEQ
-global	Game_Setup, LFSR_Load_Seed
+global	Game_Setup, LFSR_Load_Seed, OUTPUT_GEN_SEQ
 
 extrn	KP_Change, KPPrev, KPOWC, KP_ASCII_TO_VAL, KP_Setup, GLCD_Setup
-extrn	KP_DOWC, GLCD_delay_ms, Sound_Setup
+extrn	KP_DOWC, GLCD_delay_ms, Sound_Setup, Output_Bitmap, Clear_Bitmap
 
 psect	udata_bank5
 GENSEQ:	    ds	0x80
@@ -19,7 +19,10 @@ OUT:	    ds	1
 RESULT:	    ds	1
 COUNTER:    ds	1
 INPUTCHAR:  ds	1
+GENCHAR:    ds	1
 SCORE_1:    ds	1
+OUTPrev:    ds	1
+OUTCurr:    ds	1
 
 psect	uart_code,class=CODE
 
@@ -126,6 +129,30 @@ LFSR_RANDINT:
     bra	    LFSR_RANDINT
     movf    RESULT, W, A
     return
+
+OUTPUT_GEN_SEQ:
+    movwf   COUNTER, A
+    LFSR    0, GENSEQ
+    movlw   0x3f
+    movwf   OUTPrev, A
+    clrf    OUTCurr, A
+Out_Char:
+    movf    INDF0, W, A
+    call    Sound_Setup
+    movf    INDF0, W, A
+    call    Output_Bitmap
+    movlw   0xFF
+    call    GLCD_delay_ms
+    movlw   0xFF
+    call    GLCD_delay_ms
+    movf    INDF0, W, A
+    call    Clear_Bitmap
+    INFSNZ  FSR0L, F, A
+    INCF    FSR0H, F, A
+    decfsz  COUNTER, A
+    bra	    Out_Char
+    return
+    
 
 GEN_RAND_SEQ:
     movwf   COUNTER, A

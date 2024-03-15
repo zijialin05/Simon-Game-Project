@@ -1,17 +1,103 @@
 #include <xc.inc>
     
-global  GLCD_Setup
+global  GLCD_Setup, Output_Bitmap, Clear_Bitmap
 global	OUT_0, OUT_1, OUT_2, OUT_3, OUT_4, OUT_5, OUT_6, OUT_7, OUT_8, OUT_9
 global	CLR_0, CLR_1, CLR_2, CLR_3, CLR_4, CLR_5, CLR_6, CLR_7, CLR_8, CLR_9
 extrn	GLCD_Select_y1, GLCD_Select_y2, GLCD_Select_x1, GLCD_Select_x2
 extrn	GLCD_Write_Display1, GLCD_Write_Display2, GLCD_Read_Status
 extrn	GLCD_ON1, GLCD_ON2, GLCD_OFF1, GLCD_OFF2
 
+psect	udata_acs
+OUT_TEMP:	    ds  1
 
 psect	uart_code,class=CODE
 
 Output_Bitmap:
-	
+	movwf	OUT_TEMP, A
+	movf	OUT_TEMP, W, A
+	btfsc   STATUS, 2
+	call	OUT_0
+	movf	OUT_TEMP, W, A
+	sublw	0x01
+	btfsc   STATUS, 2
+	call	OUT_1
+	movf	OUT_TEMP, W, A
+	sublw	0x02
+	btfsc   STATUS, 2
+	call	OUT_2
+	movf	OUT_TEMP, W, A
+	sublw	0x03
+	btfsc   STATUS, 2
+	call	OUT_3
+	movf	OUT_TEMP, W, A
+	sublw	0x04
+	btfsc   STATUS, 2
+	call	OUT_4
+	movf	OUT_TEMP, W, A
+	sublw	0x05
+	btfsc   STATUS, 2
+	call	OUT_5
+	movf	OUT_TEMP, W, A
+	sublw	0x06
+	btfsc   STATUS, 2
+	call	OUT_6
+	movf	OUT_TEMP, W, A
+	sublw	0x07
+	btfsc   STATUS, 2
+	call	OUT_7
+	movf	OUT_TEMP, W, A
+	sublw	0x08
+	btfsc   STATUS, 2
+	call	OUT_8
+	movf	OUT_TEMP, W, A
+	sublw	0x09
+	btfsc   STATUS, 2
+	call	OUT_9
+	return
+
+Clear_Bitmap:
+	movwf	OUT_TEMP, A
+	movf	OUT_TEMP, W, A
+	btfsc   STATUS, 2
+	call	CLR_0
+	movf	OUT_TEMP, W, A
+	sublw	0x01
+	btfsc   STATUS, 2
+	call	CLR_1
+	movf	OUT_TEMP, W, A
+	sublw	0x02
+	btfsc   STATUS, 2
+	call	CLR_2
+	movf	OUT_TEMP, W, A
+	sublw	0x03
+	btfsc   STATUS, 2
+	call	CLR_3
+	movf	OUT_TEMP, W, A
+	sublw	0x04
+	btfsc   STATUS, 2
+	call	CLR_4
+	movf	OUT_TEMP, W, A
+	sublw	0x05
+	btfsc   STATUS, 2
+	call	CLR_5
+	movf	OUT_TEMP, W, A
+	sublw	0x06
+	btfsc   STATUS, 2
+	call	CLR_6
+	movf	OUT_TEMP, W, A
+	sublw	0x07
+	btfsc   STATUS, 2
+	call	CLR_7
+	movf	OUT_TEMP, W, A
+	sublw	0x08
+	btfsc   STATUS, 2
+	call	CLR_8
+	movf	OUT_TEMP, W, A
+	sublw	0x09
+	btfsc   STATUS, 2
+	call	CLR_9
+	return
+
 
 OUT_1:	;write the bitmap to fixed position one byte by one byte
 	movlw	0x05			;starting from line 5
