@@ -1,6 +1,6 @@
 #include <xc.inc>
     
-global  GLCD_Setup, OUT_1
+global  GLCD_Setup, OUT_1, OUT_2, OUT_3, CLR_1, CLR_2, CLR_3
 extrn	GLCD_Select_y1, GLCD_Select_y2, GLCD_Select_x1, GLCD_Select_x2
 extrn	GLCD_Write_Display1, GLCD_Write_Display2, GLCD_Read_Status
 extrn	GLCD_ON1, GLCD_ON2, GLCD_OFF1, GLCD_OFF2
@@ -157,45 +157,40 @@ CLR_2:	;write the bitmap to fixed position one byte by one byte
 	return
 
 OUT_3:
-	movlw	0x3C			;starting from line 60
-	call	GLCD_Select_y1
-	movlw	0x00			;writing to page 0
-	call	GLCD_Select_x1
-	movlw	00010000B
-	call	GLCD_Write_Display1
-	movlw	00001000B
-	call	GLCD_Write_Display1
-	movlw	10001000B
-	call	GLCD_Write_Display1
-	movlw	0x3C			;starting from line 60
-	call	GLCD_Select_y1
-	movlw	0x01			;writing to page 1
-	movlw	00001000B
-	call	GLCD_Write_Display1
-	movlw	00010000B
-	call	GLCD_Write_Display1
-	movlw	00010000B
-	call	GLCD_Write_Display1
-	movlw	0x00			;starting from chip 2 line 0
-	call	GLCD_Select_y2
-	movlw	0x00			;writing to page 0
-	call	GLCD_Select_x2
-	movlw	10001000B
-	call	GLCD_Write_Display2
-	movlw	01001000B
-	call	GLCD_Write_Display2
-	movlw	00110000B
-	call	GLCD_Write_Display2
-	movlw	0x00			;starting from chip 2 line 0
-	call	GLCD_Select_y2
-	movlw	0x01			;writing to page 1
-	call	GLCD_Select_x2
-	movlw	00010000B
-	call	GLCD_Write_Display2
-	movlw	00010001B
-	call	GLCD_Write_Display2
-	movlw	00001110B
-	call	GLCD_Write_Display2
+	movlw 0x05
+	call GLCD_Select_y2
+	movlw 0x00
+	call GLCD_Select_x2
+	movlw 00010000B
+	call GLCD_Write_Display2
+	movlw 00001000B
+	call GLCD_Write_Display2
+	movlw 10001000B
+	call GLCD_Write_Display2
+	movlw 10001000B
+	call GLCD_Write_Display2
+	movlw 01001000B
+	call GLCD_Write_Display2
+	movlw 00110000B
+	call GLCD_Write_Display2
+
+
+	movlw 0x05
+	call GLCD_Select_y2
+	movlw 0x01
+	call GLCD_Select_x2
+	movlw 00001000B
+	call GLCD_Write_Display2
+	movlw 00010000B
+	call GLCD_Write_Display2
+	movlw 00010000B
+	call GLCD_Write_Display2
+	movlw 00010000B
+	call GLCD_Write_Display2
+	movlw 00010001B
+	call GLCD_Write_Display2
+	movlw 00001110B
+	call GLCD_Write_Display2
 	return
 
 CLR_3:

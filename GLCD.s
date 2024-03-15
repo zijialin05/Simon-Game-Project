@@ -5,6 +5,7 @@ global	GLCD_Select_y1, GLCD_Select_y2, GLCD_Select_x1, GLCD_Select_x2
 global	GLCD_Write_Display1, GLCD_Write_Display2, GLCD_Read_Status
 global	GLCD_ON1, GLCD_ON2, GLCD_OFF1, GLCD_OFF2, GLCD_STATUS
 global	GLCD_YLOC, GLCD_XLOC, GLCD_CounterY, GLCD_CounterX
+global	GLCD_delay_ms
 
 psect	udata_acs   ; reserve data space in access ram
 ; The first few variables are for the delay routines
@@ -70,6 +71,18 @@ write_zeros:
 	movlw	00000111B
 	cpfsgt	GLCD_XLOC, A
 	bra	page_select
+	movlw	0x00
+	call	GLCD_Select_x1
+	movlw	0x3F
+	call	GLCD_Select_y1
+	movlw	0x00
+	call	GLCD_Write_Display1
+	movlw	0x00
+	call	GLCD_Select_x2
+	movlw	0x3F
+	call	GLCD_Select_y2
+	movlw	0x00
+	call	GLCD_Write_Display2
 	return
 
 GLCD_START_LINE_AT_ZERO1:

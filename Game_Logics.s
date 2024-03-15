@@ -1,9 +1,11 @@
 #include <xc.inc>
     
 global  LFSR_Step, LFSR_H, LFSR_L, TEMP, OUT, RESULT, LFSR_Load_Fixed_Seed
-global	GEN_RAND_SEQ, FSR0L, FSR0H, COUNTER
+global	GEN_RAND_SEQ, FSR0L, FSR0H, COUNTER, INPUT_SEQ, GENSEQ, INPTSEQ
+global	Game_Setup, LFSR_Load_Seed
 
-extrn	KP_Change, KPPrev, KPOWC, KP_ASCII_TO_VAL
+extrn	KP_Change, KPPrev, KPOWC, KP_ASCII_TO_VAL, KP_Setup, GLCD_Setup
+extrn	KP_DOWC
 
 psect	udata_bank5
 GENSEQ:	    ds	0x80
@@ -19,6 +21,12 @@ COUNTER:    ds	1
 INPUTCHAR:  ds	1
 
 psect	uart_code,class=CODE
+
+Game_Setup:
+    call    KP_Setup
+    call    GLCD_Setup
+    call    LFSR_Setup
+    return
 
 LFSR_Setup:
     clrf    LFSR_H, A
@@ -123,7 +131,7 @@ INPUT_SEQ:
     movwf   KPPrev, A
     LFSR    1, INPTSEQ
 ONE_INPUT:
-    call    KPOWC
+    call    KP_DOWC
     btfsc   STATUS, 2
     bra	    ONE_INPUT
     call    KP_ASCII_TO_VAL

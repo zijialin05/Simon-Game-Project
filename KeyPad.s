@@ -1,6 +1,6 @@
 #include <xc.inc>
     
-global  KP_Read, KP_Setup, KP_Change, KPPrev, KP_ASCII_TO_VAL
+global  KP_Read, KP_Setup, KP_Change, KPPrev, KP_ASCII_TO_VAL, KPOWC, KP_DOWC
 
 psect	udata_acs   ; reserve data space in access ram
 KP_cnt_l:   ds 1   ; reserve 1 byte for variable KP_cnt_l
@@ -13,6 +13,7 @@ KPCAR:	    ds 1
 KPPrev:	    ds 1
 KPCurr:	    ds 1
 KPASCII:    ds 1
+KP_DeB:	    ds 1
 
 psect	uart_code,class=CODE
 
@@ -171,6 +172,7 @@ KP_SPAC:    ;save previous and current values
     return
 
 KPOWC:	;the Keypad function that Output When Change in button press detected
+    ; From testing, this function is prone to bouncing
     call    KP_Read
     movwf   KPCurr, A
     cpfseq  KPPrev, A
@@ -180,6 +182,30 @@ KP_SPAC2:    ;save previous and current values
     movwf   KPPrev, A
     movf    KPCurr, W, A
     return
+
+KP_DRead:   ;This is with the debouncing feature
+    call    KP_Read
+    movwf   KP_DeB
+    movlw   0x01
+    call    KP_delay_ms
+    call    KP_Read
+    xorwf   KP_DeB, W, A
+    btfsc   STATUS, 2
+    retlw   0x00
+    movf    KP_DeB, W, A
+    return
+
+KP_DOWC:
+    call    KP_DRead
+    movwf   KPCurr, A
+    cpfseq  KPPrev, A
+    bra	    KP_DSPAC
+    bra	    KP_DOWC
+KP_DSPAC:
+    movwf   KPPrev, A
+    movf    KPCurr, W, A
+    return
+    
     
 KP_delay_ms:		    ; delay given in ms in W
 	movwf	KP_cnt_ms, A
