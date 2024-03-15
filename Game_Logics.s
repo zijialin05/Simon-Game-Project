@@ -3,7 +3,7 @@
 global  LFSR_Step, LFSR_H, LFSR_L, TEMP, OUT, RESULT, LFSR_Load_Fixed_Seed
 global	GEN_RAND_SEQ, FSR0L, FSR0H, COUNTER
 
-extrn	KP_Change, KPPrev
+extrn	KP_Change, KPPrev, KPOWC, KP_ASCII_TO_VAL
 
 psect	udata_bank5
 GENSEQ:	    ds	0x80
@@ -16,6 +16,7 @@ TEMP:	    ds	1
 OUT:	    ds	1
 RESULT:	    ds	1
 COUNTER:    ds	1
+INPUTCHAR:  ds	1
 
 psect	uart_code,class=CODE
 
@@ -120,6 +121,23 @@ INPUT_SEQ:
     movwf   COUNTER, A
     movlw   0x00
     movwf   KPPrev, A
+    LFSR    1, INPTSEQ
 ONE_INPUT:
-    call    KP_Change
+    call    KPOWC
+    btfsc   STATUS, 2
+    bra	    ONE_INPUT
+    call    KP_ASCII_TO_VAL
+    movwf   INPUTCHAR, A
+    sublw   0x3f
+    btfsc   STATUS, 2
+    bra	    ONE_INPUT
+    movf    INPUTCHAR, W, A
+    movwf   INDF1
+    INFSNZ  FSR1L, F, A
+    INCF    FSR1H, F, A
+    DECFSZ  COUNTER, F, A
+    bra	    ONE_INPUT
+    return
+
+
     

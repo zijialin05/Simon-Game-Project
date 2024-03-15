@@ -1,6 +1,6 @@
 #include <xc.inc>
     
-global  KP_Read, KP_Setup, KP_Change, KPPrev
+global  KP_Read, KP_Setup, KP_Change, KPPrev, KP_ASCII_TO_VAL
 
 psect	udata_acs   ; reserve data space in access ram
 KP_cnt_l:   ds 1   ; reserve 1 byte for variable KP_cnt_l
@@ -12,6 +12,7 @@ KP_row:	    ds 1
 KPCAR:	    ds 1
 KPPrev:	    ds 1
 KPCurr:	    ds 1
+KPASCII:    ds 1
 
 psect	uart_code,class=CODE
 
@@ -111,9 +112,55 @@ KP_Read:
     sublw   01111110B
     btfsc   STATUS, 2
     retlw   'A'
+    retlw   0x00
+    return
+
+KP_ASCII_TO_VAL:
+    movwf   KPASCII, A
+    movf    KPASCII, W, A
+    sublw   '0'
+    btfsc   STATUS, 2
+    retlw   0x00
+    movf    KPASCII, W, A
+    sublw   '1'
+    btfsc   STATUS, 2
+    retlw   0x01
+    movf    KPASCII, W, A
+    sublw   '2'
+    btfsc   STATUS, 2
+    retlw   0x02
+    movf    KPASCII, W, A
+    sublw   '3'
+    btfsc   STATUS, 2
+    retlw   0x03
+    movf    KPASCII, W, A
+    sublw   '4'
+    btfsc   STATUS, 2
+    retlw   0x04
+    movf    KPASCII, W, A
+    sublw   '5'
+    btfsc   STATUS, 2
+    retlw   0x05
+    movf    KPASCII, W, A
+    sublw   '6'
+    btfsc   STATUS, 2
+    retlw   0x06
+    movf    KPASCII, W, A
+    sublw   '7'
+    btfsc   STATUS, 2
+    retlw   0x07
+    movf    KPASCII, W, A
+    sublw   '8'
+    btfsc   STATUS, 2
+    retlw   0x08
+    movf    KPASCII, W, A
+    sublw   '9'
+    btfsc   STATUS, 2
+    retlw   0x09
     retlw   0x3f
     return
     
+
 KP_Change:
     call    KP_Read
     cpfseq  KPPrev, A
