@@ -23,6 +23,7 @@ GENCHAR:    ds	1
 SCORE_1:    ds	1
 OUTPrev:    ds	1
 OUTCurr:    ds	1
+SEQ_LEN:    ds	1
 
 psect	uart_code,class=CODE
 
@@ -40,9 +41,21 @@ GAME_START:
 GAME_SESSION:
     call    LFSR_Load_Seed
     clrf    SCORE_1, A
+    movlw   0x03
+    movwf   SEQ_LEN, A
 GAME_ROUND:
+    movf    SEQ_LEN, W, A
     call    GEN_RAND_SEQ
-    call    INPUT_SEQ		;Not Finished Yet
+    movf    SEQ_LEN, W, A
+    call    INPUT_SEQ
+    movf    SEQ_LEN, W, A
+    call    SEQ_COMPARE
+    btfss   STATUS, 2
+    bra	    FAILED_ROUND
+    incf    SCORE_1
+FAILED_ROUND:
+    
+    
     return
 
 LFSR_Setup:
@@ -150,7 +163,27 @@ Out_Char:
     decfsz  COUNTER, A
     bra	    Out_Char
     return
-    
+
+SEQ_COMPARE:
+    movwf   COUNTER, A
+    clrf    TEMP, A
+    LFSR    1, GENSEQ
+    LFSR    2, INPTSEQ
+Individual_Compare:
+    movf    INDF1, W, A
+    movwf   TEMP, A
+    movf    INDF2, W, A
+    cpfseq  TEMP, A
+    bra	    No_Match
+    INFSNZ  FSR1L, F, A
+    INCF    FSR1H, F, A
+    INFSNZ  FSR2L, F, A
+    INCF    FSR2H, F, A
+    decfsz  COUNTER, A
+    bra	    Individual_Compare
+    retlw   0xFF
+No_Match:
+    retlw   0x00
 
 GEN_RAND_SEQ:
     movwf   COUNTER, A
