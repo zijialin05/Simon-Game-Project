@@ -910,3 +910,228 @@ CLR_0:
 	call	GLCD_Write_Display1
 	return
 	
+SCORE0:
+	;SCOREX is the module for oututing the 8x8 bitmaps of integer X
+	;SCOREX modules are implemented for outputing scores on the GLCD
+	;Bitmaps will appear on the first page of display 2
+	;with y address specified by the content of WREG
+	;NOTE: THESE ARE GENERAL COMMENTS FOR ALL SCOREX MODULES
+	;NOTE: THESE COMMENTS WILL NOT APPEAR AGAIN IN OTHER SCOREX MODULES
+	call	GLCD_Select_y2		;Select Y address
+	movlw	0x01
+	call	GLCD_Select_x2		;Select Page 1 of Display 2
+	movlw	00111100B
+	call	GLCD_Write_Display2	;Write 0th byte
+	movlw	01111110B
+	call	GLCD_Write_Display2	;Write 1st byte
+	movlw	11000011B
+	call	GLCD_Write_Display2	;Write 2nd byte
+	movlw	10000001B
+	call	GLCD_Write_Display2	;Write 3rd byte
+	movlw	10000001B
+	call	GLCD_Write_Display2	;Write 4th byte
+	movlw	11000011B
+	call	GLCD_Write_Display2	;Write 5th byte
+	movlw	01111110B
+	call	GLCD_Write_Display2	;Write 6th byte
+	movlw	00111100B
+	call	GLCD_Write_Display2	;Write 7th byte
+	return
+
+SCORE1:
+	call	GLCD_Select_y2		;Select Y address
+	movlw	0x01
+	call	GLCD_Select_x2		;Select Page 1 of Display 2
+	movlw	00000000B
+	call	GLCD_Write_Display2	;Write 0th byte
+	movlw	00000000B
+	call	GLCD_Write_Display2	;Write 1st byte
+	movlw	11000010B
+	call	GLCD_Write_Display2	;Write 2nd byte
+	movlw	11111111B
+	call	GLCD_Write_Display2	;Write 3rd byte
+	movlw	11111111B
+	call	GLCD_Write_Display2	;Write 4th byte
+	movlw	11000000B
+	call	GLCD_Write_Display2	;Write 5th byte
+	movlw	00000000B
+	call	GLCD_Write_Display2	;Write 6th byte
+	movlw	00000000B
+	call	GLCD_Write_Display2	;Write 7th byte
+	return
+
+SCORE2:
+	call	GLCD_Select_y2		;Select Y address
+	movlw	0x01
+	call	GLCD_Select_x2		;Select Page 1 of Display 2
+	movlw	00000100B
+	call	GLCD_Write_Display2	;Write 0th byte
+	movlw	11000110B
+	call	GLCD_Write_Display2	;Write 1st byte
+	movlw	11100011B
+	call	GLCD_Write_Display2	;Write 2nd byte
+	movlw	11100001B
+	call	GLCD_Write_Display2	;Write 3rd byte
+	movlw	11010001B
+	call	GLCD_Write_Display2	;Write 4th byte
+	movlw	11011011B
+	call	GLCD_Write_Display2	;Write 5th byte
+	movlw	11001110B
+	call	GLCD_Write_Display2	;Write 6th byte
+	movlw	11000100B
+	call	GLCD_Write_Display2	;Write 7th byte
+	return
+
+SCORE3:
+	call	GLCD_Select_y2		;Select Y address
+	movlw	0x01
+	call	GLCD_Select_x2		;Select Page 1 of Display 2
+	movlw	00100000B
+	call	GLCD_Write_Display2	;Write 0th byte
+	movlw	01100010B
+	call	GLCD_Write_Display2	;Write 1st byte
+	movlw	11000011B
+	call	GLCD_Write_Display2	;Write 2nd byte
+	movlw	10001001B
+	call	GLCD_Write_Display2	;Write 3rd byte
+	movlw	10001001B
+	call	GLCD_Write_Display2	;Write 4th byte
+	movlw	11001011B
+	call	GLCD_Write_Display2	;Write 5th byte
+	movlw	01111110B
+	call	GLCD_Write_Display2	;Write 6th byte
+	movlw	00110100B
+	call	GLCD_Write_Display2	;Write 7th byte
+	return
+
+SCORE4:
+	call	GLCD_Select_y2		;Select Y address
+	movlw	0x01
+	call	GLCD_Select_x2		;Select Page 1 of Display 2
+	movlw	00110000B
+	call	GLCD_Write_Display2	;Write 0th byte
+	movlw	00111000B
+	call	GLCD_Write_Display2	;Write 1st byte
+	movlw	00101100B
+	call	GLCD_Write_Display2	;Write 2nd byte
+	movlw	00100110B
+	call	GLCD_Write_Display2	;Write 3rd byte
+	movlw	00100011B
+	call	GLCD_Write_Display2	;Write 4th byte
+	movlw	11111111B
+	call	GLCD_Write_Display2	;Write 5th byte
+	movlw	00100000B
+	call	GLCD_Write_Display2	;Write 6th byte
+	movlw	00100000B
+	call	GLCD_Write_Display2	;Write 7th byte
+	return
+
+SCORE5:
+	call	GLCD_Select_y2		;Select Y address
+	movlw	0x01
+	call	GLCD_Select_x2		;Select Page 1 of Display 2
+	movlw	00100000B
+	call	GLCD_Write_Display2	;Write 0th byte
+	movlw	01101111B
+	call	GLCD_Write_Display2	;Write 1st byte
+	movlw	11001111B
+	call	GLCD_Write_Display2	;Write 2nd byte
+	movlw	10001011B
+	call	GLCD_Write_Display2	;Write 3rd byte
+	movlw	10001011B
+	call	GLCD_Write_Display2	;Write 4th byte
+	movlw	11111011B
+	call	GLCD_Write_Display2	;Write 5th byte
+	movlw	01110011B
+	call	GLCD_Write_Display2	;Write 6th byte
+	movlw	00000000B
+	call	GLCD_Write_Display2	;Write 7th byte
+	return
+
+SCORE6:
+	call	GLCD_Select_y2		;Select Y address
+	movlw	0x01
+	call	GLCD_Select_x2		;Select Page 1 of Display 2
+	movlw	00111100B
+	call	GLCD_Write_Display2	;Write 0th byte
+	movlw	01111110B
+	call	GLCD_Write_Display2	;Write 1st byte
+	movlw	11001011B
+	call	GLCD_Write_Display2	;Write 2nd byte
+	movlw	10001001B
+	call	GLCD_Write_Display2	;Write 3rd byte
+	movlw	10001001B
+	call	GLCD_Write_Display2	;Write 4th byte
+	movlw	11111011B
+	call	GLCD_Write_Display2	;Write 5th byte
+	movlw	01110010B
+	call	GLCD_Write_Display2	;Write 6th byte
+	movlw	00000000B
+	call	GLCD_Write_Display2	;Write 7th byte
+	return
+
+SCORE7:
+	call	GLCD_Select_y2		;Select Y address
+	movlw	0x01
+	call	GLCD_Select_x2		;Select Page 1 of Display 2
+	movlw	00000011B
+	call	GLCD_Write_Display2	;Write 0th byte
+	movlw	00000011B
+	call	GLCD_Write_Display2	;Write 1st byte
+	movlw	00000011B
+	call	GLCD_Write_Display2	;Write 2nd byte
+	movlw	11110011B
+	call	GLCD_Write_Display2	;Write 3rd byte
+	movlw	11111011B
+	call	GLCD_Write_Display2	;Write 4th byte
+	movlw	00001111B
+	call	GLCD_Write_Display2	;Write 5th byte
+	movlw	00000111B
+	call	GLCD_Write_Display2	;Write 6th byte
+	movlw	00000011B
+	call	GLCD_Write_Display2	;Write 7th byte
+	return
+
+SCORE8:
+	call	GLCD_Select_y2		;Select Y address
+	movlw	0x01
+	call	GLCD_Select_x2		;Select Page 1 of Display 2
+	movlw	00100100B
+	call	GLCD_Write_Display2	;Write 0th byte
+	movlw	01101110B
+	call	GLCD_Write_Display2	;Write 1st byte
+	movlw	11011011B
+	call	GLCD_Write_Display2	;Write 2nd byte
+	movlw	10010001B
+	call	GLCD_Write_Display2	;Write 3rd byte
+	movlw	10010001B
+	call	GLCD_Write_Display2	;Write 4th byte
+	movlw	11011011B
+	call	GLCD_Write_Display2	;Write 5th byte
+	movlw	01101110B
+	call	GLCD_Write_Display2	;Write 6th byte
+	movlw	00100100B
+	call	GLCD_Write_Display2	;Write 7th byte
+	return
+
+SCORE9:
+	call	GLCD_Select_y2		;Select Y address
+	movlw	0x01
+	call	GLCD_Select_x2		;Select Page 1 of Display 2
+	movlw	00001100B
+	call	GLCD_Write_Display2	;Write 0th byte
+	movlw	01011110B
+	call	GLCD_Write_Display2	;Write 1st byte
+	movlw	11010011B
+	call	GLCD_Write_Display2	;Write 2nd byte
+	movlw	10010001B
+	call	GLCD_Write_Display2	;Write 3rd byte
+	movlw	10010001B
+	call	GLCD_Write_Display2	;Write 4th byte
+	movlw	11111111B
+	call	GLCD_Write_Display2	;Write 5th byte
+	movlw	01111110B
+	call	GLCD_Write_Display2	;Write 6th byte
+	movlw	00000000B
+	call	GLCD_Write_Display2	;Write 7th byte
+	return
