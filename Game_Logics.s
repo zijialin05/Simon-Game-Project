@@ -6,6 +6,7 @@ global	Game_Setup, LFSR_Load_Seed, OUTPUT_GEN_SEQ
 
 extrn	KP_Change, KPPrev, KPOWC, KP_ASCII_TO_VAL, KP_Setup, GLCD_Setup
 extrn	KP_DOWC, GLCD_delay_ms, Sound_Setup, Output_Bitmap, Clear_Bitmap
+extrn	OUT_SCORE, Clear_Score
 
 psect	udata_bank5
 GENSEQ:	    ds	0x80
@@ -38,8 +39,8 @@ GAME_START:
     movlw   0xFF
     call    GLCD_delay_ms
     call    KP_DOWC
-GAME_SESSION:
     call    LFSR_Load_Seed
+GAME_SESSION:
     clrf    SCORE_1, A
     movlw   0x03
     movwf   SEQ_LEN, A
@@ -53,9 +54,14 @@ GAME_ROUND:
     btfss   STATUS, 2
     bra	    FAILED_ROUND
     incf    SCORE_1
+    call    OUT_SCORE
+    movlw   0x09
+    cpfsgt  SEQ_LEN, A
+    incf    SEQ_LEN, A
+    bra	    GAME_ROUND
 FAILED_ROUND:
-    
-    
+    call    Clear_Score
+    bra	    GAME_SESSION
     return
 
 LFSR_Setup:

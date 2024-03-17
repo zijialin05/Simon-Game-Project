@@ -1,6 +1,6 @@
 #include <xc.inc>
     
-global  GLCD_Setup, Output_Bitmap, Clear_Bitmap
+global  GLCD_Setup, Output_Bitmap, Clear_Bitmap, Output_Score_Digit, Clear_Score
 global	OUT_0, OUT_1, OUT_2, OUT_3, OUT_4, OUT_5, OUT_6, OUT_7, OUT_8, OUT_9
 global	CLR_0, CLR_1, CLR_2, CLR_3, CLR_4, CLR_5, CLR_6, CLR_7, CLR_8, CLR_9
 extrn	GLCD_Select_y1, GLCD_Select_y2, GLCD_Select_x1, GLCD_Select_x2
@@ -9,8 +9,66 @@ extrn	GLCD_ON1, GLCD_ON2, GLCD_OFF1, GLCD_OFF2
 
 psect	udata_acs
 OUT_TEMP:	    ds  1
+COUNTER:	    ds	1
 
 psect	uart_code,class=CODE
+
+Output_Score_Digit:
+	movwf	OUT_TEMP, A
+	movf	OUT_TEMP, W, A
+	btfsc   STATUS, 2
+	call	SCORE0
+	movf	OUT_TEMP, W, A
+	sublw	0x01
+	btfsc   STATUS, 2
+	call	SCORE1
+	movf	OUT_TEMP, W, A
+	sublw	0x02
+	btfsc   STATUS, 2
+	call	SCORE2
+	movf	OUT_TEMP, W, A
+	sublw	0x03
+	btfsc   STATUS, 2
+	call	SCORE3
+	movf	OUT_TEMP, W, A
+	sublw	0x04
+	btfsc   STATUS, 2
+	call	SCORE4
+	movf	OUT_TEMP, W, A
+	sublw	0x05
+	btfsc   STATUS, 2
+	call	SCORE5
+	movf	OUT_TEMP, W, A
+	sublw	0x06
+	btfsc   STATUS, 2
+	call	SCORE6
+	movf	OUT_TEMP, W, A
+	sublw	0x07
+	btfsc   STATUS, 2
+	call	SCORE7
+	movf	OUT_TEMP, W, A
+	sublw	0x08
+	btfsc   STATUS, 2
+	call	SCORE8
+	movf	OUT_TEMP, W, A
+	sublw	0x09
+	btfsc   STATUS, 2
+	call	SCORE9
+	return
+
+Clear_Score:
+	movlw	0x1C	;Total of 28 Y Addresses to Clear
+	movwf	COUNTER, A
+	movlw	0x01	;Choose Page 1 of Chip 2
+	call	GLCD_Select_x2
+	movlw	0x24	;Start from Y address 36
+	call	GLCD_Select_y2
+clear_one_address:
+	movlw	0x00	;Write zeros to clear display line
+	call	GLCD_Write_Display2
+	decfsz	COUNTER, A	    ;decrement counter, skip if zero
+	bra	clear_one_address   ;continue to clear if COUNTER not zero
+	return
 
 Output_Bitmap:
 	movwf	OUT_TEMP, A
@@ -914,10 +972,9 @@ SCORE0:
 	;SCOREX is the module for oututing the 8x8 bitmaps of integer X
 	;SCOREX modules are implemented for outputing scores on the GLCD
 	;Bitmaps will appear on the first page of display 2
-	;with y address specified by the content of WREG
+	;Y address must be specified before calling these modules
 	;NOTE: THESE ARE GENERAL COMMENTS FOR ALL SCOREX MODULES
 	;NOTE: THESE COMMENTS WILL NOT APPEAR AGAIN IN OTHER SCOREX MODULES
-	call	GLCD_Select_y2		;Select Y address
 	movlw	0x01
 	call	GLCD_Select_x2		;Select Page 1 of Display 2
 	movlw	00111100B
@@ -939,7 +996,6 @@ SCORE0:
 	return
 
 SCORE1:
-	call	GLCD_Select_y2		;Select Y address
 	movlw	0x01
 	call	GLCD_Select_x2		;Select Page 1 of Display 2
 	movlw	00000000B
@@ -961,7 +1017,6 @@ SCORE1:
 	return
 
 SCORE2:
-	call	GLCD_Select_y2		;Select Y address
 	movlw	0x01
 	call	GLCD_Select_x2		;Select Page 1 of Display 2
 	movlw	00000100B
@@ -983,7 +1038,6 @@ SCORE2:
 	return
 
 SCORE3:
-	call	GLCD_Select_y2		;Select Y address
 	movlw	0x01
 	call	GLCD_Select_x2		;Select Page 1 of Display 2
 	movlw	00100000B
@@ -1005,7 +1059,6 @@ SCORE3:
 	return
 
 SCORE4:
-	call	GLCD_Select_y2		;Select Y address
 	movlw	0x01
 	call	GLCD_Select_x2		;Select Page 1 of Display 2
 	movlw	00110000B
@@ -1027,7 +1080,6 @@ SCORE4:
 	return
 
 SCORE5:
-	call	GLCD_Select_y2		;Select Y address
 	movlw	0x01
 	call	GLCD_Select_x2		;Select Page 1 of Display 2
 	movlw	00100000B
@@ -1049,7 +1101,6 @@ SCORE5:
 	return
 
 SCORE6:
-	call	GLCD_Select_y2		;Select Y address
 	movlw	0x01
 	call	GLCD_Select_x2		;Select Page 1 of Display 2
 	movlw	00111100B
@@ -1071,7 +1122,6 @@ SCORE6:
 	return
 
 SCORE7:
-	call	GLCD_Select_y2		;Select Y address
 	movlw	0x01
 	call	GLCD_Select_x2		;Select Page 1 of Display 2
 	movlw	00000011B
@@ -1093,7 +1143,6 @@ SCORE7:
 	return
 
 SCORE8:
-	call	GLCD_Select_y2		;Select Y address
 	movlw	0x01
 	call	GLCD_Select_x2		;Select Page 1 of Display 2
 	movlw	00100100B
@@ -1115,7 +1164,6 @@ SCORE8:
 	return
 
 SCORE9:
-	call	GLCD_Select_y2		;Select Y address
 	movlw	0x01
 	call	GLCD_Select_x2		;Select Page 1 of Display 2
 	movlw	00001100B
