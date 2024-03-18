@@ -116,6 +116,10 @@ Output_Bitmap:
 Clear_Bitmap:
 	movwf	OUT_TEMP, A
 	movf	OUT_TEMP, W, A
+	sublw	0x3f
+	btfsc   STATUS, 2
+	return
+	movf	OUT_TEMP, W, A
 	btfsc   STATUS, 2
 	call	CLR_0
 	movf	OUT_TEMP, W, A
@@ -303,7 +307,7 @@ CLR_2:	;write the bitmap to fixed position one byte by one byte
 	call	GLCD_Write_Display1
 	movlw	0x00
 	call	GLCD_Write_Display1
-	
+	return
 	
 
 OUT_3:

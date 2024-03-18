@@ -202,7 +202,7 @@ KP_SPAC2:    ;save previous and current values
 KP_DRead:   ;This is with the debouncing feature
     call    KP_Read
     movwf   KP_DeB
-    movlw   0x01
+    movlw   0x02
     call    KP_delay_ms
     call    KP_Read
     xorwf   KP_DeB, W, A

@@ -2,15 +2,16 @@
     
 global  LFSR_Step, LFSR_H, LFSR_L, TEMP, OUT, RESULT, LFSR_Load_Fixed_Seed
 global	GEN_RAND_SEQ, FSR0L, FSR0H, COUNTER, INPUT_SEQ, GENSEQ, INPTSEQ
-global	Game_Setup, LFSR_Load_Seed, OUTPUT_GEN_SEQ
+global	Game_Setup, LFSR_Load_Seed, OUTPUT_GEN_SEQ, GAME_START, CHAR_TO_CLEAR
+global	SCORE_1
 
 extrn	KP_Change, KPPrev, KPOWC, KP_ASCII_TO_VAL, KP_Setup, GLCD_Setup
 extrn	KP_DOWC, GLCD_delay_ms, Sound_Setup, Output_Bitmap, Clear_Bitmap
 extrn	OUT_SCORE, Clear_Score
 
 psect	udata_bank5
-GENSEQ:	    ds	0x80
-INPTSEQ:    ds	0x80
+GENSEQ:		ds  0x80
+INPTSEQ:	ds  0x80
 
 psect	udata_acs   ; reserve data space in access ram
 LFSR_H:	    ds	1
@@ -25,6 +26,11 @@ SCORE_1:    ds	1
 OUTPrev:    ds	1
 OUTCurr:    ds	1
 SEQ_LEN:    ds	1
+HOME_FLAG:	ds  1
+RESTART_FLAG:	ds  1
+CLEAR_FLAG:	ds  1
+DELETE_FLAG:	ds  1
+CHAR_TO_CLEAR:	ds  1
 
 psect	uart_code,class=CODE
 
@@ -35,25 +41,45 @@ Game_Setup:
     return
 
 GAME_START:
+    clrf    HOME_FLAG, A
+    clrf    RESTART_FLAG, A
+    clrf    CLEAR_FLAG, A
+    clrf    DELETE_FLAG, A
     call    Game_Setup
     movlw   0xFF
     call    GLCD_delay_ms
     call    KP_DOWC
     call    LFSR_Load_Seed
+    call    Clear_Score
 GAME_SESSION:
     clrf    SCORE_1, A
+    movf    SCORE_1, W, A
+    call    OUT_SCORE
     movlw   0x03
     movwf   SEQ_LEN, A
 GAME_ROUND:
     movf    SEQ_LEN, W, A
     call    GEN_RAND_SEQ
     movf    SEQ_LEN, W, A
+    call    OUTPUT_GEN_SEQ
+    movf    SEQ_LEN, W, A
     call    INPUT_SEQ
+    movlw   0xFF
+    call    GLCD_delay_ms
+    movlw   0xFF
+    call    GLCD_delay_ms
+    movf    CHAR_TO_CLEAR, W, A
+    call    Clear_Bitmap
+    btfsc   HOME_FLAG, 0, A
+    bra	    GAME_START
+    btfsc   RESTART_FLAG, 0, A
+    bra	    GAME_SESSION
     movf    SEQ_LEN, W, A
     call    SEQ_COMPARE
-    btfss   STATUS, 2
+    btfss   WREG, 0
     bra	    FAILED_ROUND
-    incf    SCORE_1
+    incf    SCORE_1, F, A
+    movf    SCORE_1, W, A
     call    OUT_SCORE
     movlw   0x09
     cpfsgt  SEQ_LEN, A
@@ -204,9 +230,11 @@ Gen_seq:
     return
 
 INPUT_SEQ:
+    movlw   0x3f
+    movwf   CHAR_TO_CLEAR, A
+    movf    SEQ_LEN, W, A
     movwf   COUNTER, A
-    movlw   0x00
-    movwf   KPPrev, A
+    clrf    KPPrev, A
     LFSR    1, INPTSEQ
 ONE_INPUT:
     call    KP_DOWC
@@ -219,6 +247,25 @@ ONE_INPUT:
     bra	    ONE_INPUT
     movf    INPUTCHAR, W, A
     call    Sound_Setup
+    movlw   0x0A
+    cpfslt  INPUTCHAR, A
+    call    SPECIAL_ACTIONS
+    btfsc   HOME_FLAG, 0, A
+    return
+    btfsc   RESTART_FLAG, 0, A
+    return
+    btfsc   CLEAR_FLAG, 0, A
+    bra	    INPUT_SEQ
+    btfsc   DELETE_FLAG, 1, A
+    DECF    FSR1L, F, A
+    clrf    CLEAR_FLAG, A
+    clrf    DELETE_FLAG, A
+    movf    CHAR_TO_CLEAR, W, A
+    call    Clear_Bitmap
+    movf    INPUTCHAR, W, A
+    call    Output_Bitmap
+    movf    INPUTCHAR, W, A
+    movwf   CHAR_TO_CLEAR, A
     movf    INPUTCHAR, W, A
     movwf   INDF1
     INFSNZ  FSR1L, F, A
@@ -227,5 +274,23 @@ ONE_INPUT:
     bra	    ONE_INPUT
     return
 
+SPECIAL_ACTIONS:
+    movf    INPUTCHAR, W, A
+    sublw   0x0C
+    btfsc   STATUS, 2
+    setf    HOME_FLAG, A
+    movf    INPUTCHAR, W, A
+    sublw   0x0D
+    btfsc   STATUS, 2
+    setf    RESTART_FLAG, A
+    movf    INPUTCHAR, W, A
+    sublw   0x0E
+    btfsc   STATUS, 2
+    setf    CLEAR_FLAG, A
+    movf    INPUTCHAR, W, A
+    sublw   0x0F
+    btfsc   STATUS, 2
+    setf    DELETE_FLAG, A
+    return
 
     
