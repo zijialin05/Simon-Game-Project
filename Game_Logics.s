@@ -3,7 +3,7 @@
 global  LFSR_Step, LFSR_H, LFSR_L, TEMP, OUT, RESULT, LFSR_Load_Fixed_Seed
 global	GEN_RAND_SEQ, FSR0L, FSR0H, COUNTER, INPUT_SEQ, GENSEQ, INPTSEQ
 global	Game_Setup, LFSR_Load_Seed, OUTPUT_GEN_SEQ, GAME_START, CHAR_TO_CLEAR
-global	SCORE_1
+global	SCORE_1, SEQ_LEN
 
 extrn	KP_Change, KPPrev, KPOWC, KP_ASCII_TO_VAL, KP_Setup, GLCD_Setup
 extrn	KP_DOWC, GLCD_delay_ms, Sound_Setup, Output_Bitmap, Clear_Bitmap
@@ -84,6 +84,14 @@ GAME_ROUND:
     movlw   0x09
     cpfsgt  SEQ_LEN, A
     incf    SEQ_LEN, A
+    movlw   0xFF
+    call    GLCD_delay_ms
+    movlw   0xFF
+    call    GLCD_delay_ms
+    movlw   0xFF
+    call    GLCD_delay_ms
+    movlw   0xFF
+    call    GLCD_delay_ms
     bra	    GAME_ROUND
 FAILED_ROUND:
     call    Clear_Score
