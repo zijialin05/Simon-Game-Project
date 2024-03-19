@@ -7,7 +7,8 @@ global	SCORE_1, SEQ_LEN
 
 extrn	KP_Change, KPPrev, KPOWC, KP_ASCII_TO_VAL, KP_Setup, GLCD_Setup
 extrn	KP_DOWC, GLCD_delay_ms, Sound_Setup, Output_Bitmap, Clear_Bitmap
-extrn	OUT_SCORE, Clear_Score
+extrn	OUT_SCORE, Clear_Score, home_display, failure_display, success_display
+extrn	GLCD_ZERO_INIT
 
 psect	udata_bank5
 GENSEQ:		ds  0x80
@@ -41,23 +42,30 @@ Game_Setup:
     return
 
 GAME_START:
-    clrf    HOME_FLAG, A
-    clrf    RESTART_FLAG, A
-    clrf    CLEAR_FLAG, A
-    clrf    DELETE_FLAG, A
     call    Game_Setup
+    call    home_display
     movlw   0xFF
     call    GLCD_delay_ms
     call    KP_DOWC
     call    LFSR_Load_Seed
     call    Clear_Score
+    call    GLCD_ZERO_INIT
 GAME_SESSION:
+    clrf    HOME_FLAG, A
+    clrf    RESTART_FLAG, A
+    clrf    CLEAR_FLAG, A
+    clrf    DELETE_FLAG, A
+    movlw   0xFF
+    call    GLCD_delay_ms
+    movlw   0xFF
+    call    GLCD_delay_ms
     clrf    SCORE_1, A
     movf    SCORE_1, W, A
     call    OUT_SCORE
     movlw   0x03
     movwf   SEQ_LEN, A
 GAME_ROUND:
+    clrf    RESTART_FLAG, A
     movf    SEQ_LEN, W, A
     call    GEN_RAND_SEQ
     movf    SEQ_LEN, W, A
@@ -73,29 +81,42 @@ GAME_ROUND:
     btfsc   HOME_FLAG, 0, A
     bra	    GAME_START
     btfsc   RESTART_FLAG, 0, A
-    bra	    GAME_SESSION
+    bra	    GAME_ROUND
     movf    SEQ_LEN, W, A
     call    SEQ_COMPARE
     btfss   WREG, 0
     bra	    FAILED_ROUND
+    call    success_display
+    movlw   0xFF
+    call    GLCD_delay_ms
+    movlw   0xFF
+    call    GLCD_delay_ms
+    movlw   0xFF
+    call    GLCD_delay_ms
+    movlw   0xFF
+    call    GLCD_delay_ms
+    call    GLCD_ZERO_INIT
     incf    SCORE_1, F, A
     movf    SCORE_1, W, A
     call    OUT_SCORE
     movlw   0x09
     cpfsgt  SEQ_LEN, A
-    incf    SEQ_LEN, A
-    movlw   0xFF
-    call    GLCD_delay_ms
-    movlw   0xFF
-    call    GLCD_delay_ms
-    movlw   0xFF
-    call    GLCD_delay_ms
-    movlw   0xFF
-    call    GLCD_delay_ms
+    incf    SEQ_LEN, F, A
     bra	    GAME_ROUND
 FAILED_ROUND:
     call    Clear_Score
-    bra	    GAME_SESSION
+    call    failure_display
+    movlw   0xFF
+    call    GLCD_delay_ms
+    movlw   0xFF
+    call    GLCD_delay_ms
+    movlw   0xFF
+    call    GLCD_delay_ms
+    movlw   0xFF
+    call    GLCD_delay_ms
+    call    KP_DOWC
+    call    GLCD_ZERO_INIT
+    bra	    GAME_START
     return
 
 LFSR_Setup:
@@ -238,6 +259,7 @@ Gen_seq:
     return
 
 INPUT_SEQ:
+    clrf    CLEAR_FLAG, A
     movlw   0x3f
     movwf   CHAR_TO_CLEAR, A
     movf    SEQ_LEN, W, A
@@ -262,12 +284,9 @@ ONE_INPUT:
     return
     btfsc   RESTART_FLAG, 0, A
     return
+    call    CLEAR_HANDLER
     btfsc   CLEAR_FLAG, 0, A
     bra	    INPUT_SEQ
-    btfsc   DELETE_FLAG, 1, A
-    DECF    FSR1L, F, A
-    clrf    CLEAR_FLAG, A
-    clrf    DELETE_FLAG, A
     movf    CHAR_TO_CLEAR, W, A
     call    Clear_Bitmap
     movf    INPUTCHAR, W, A
@@ -278,8 +297,34 @@ ONE_INPUT:
     movwf   INDF1
     INFSNZ  FSR1L, F, A
     INCF    FSR1H, F, A
+    call    DELETE_HANDLER
     DECFSZ  COUNTER, F, A
     bra	    ONE_INPUT
+    return
+
+DEC_FSR1:
+    DECF    FSR1L, F, A
+    movf    FSR1L, W, A
+    sublw   0xFF
+    btfsc   STATUS, 2
+    DECF    FSR1H, F, A
+    return
+
+CLEAR_HANDLER:
+    btfss   CLEAR_FLAG, 0, A
+    return
+    movf    CHAR_TO_CLEAR, W, A
+    call    Clear_Bitmap
+    return
+
+DELETE_HANDLER:
+    btfss   DELETE_FLAG, 0, A
+    return
+    call    DEC_FSR1
+    call    DEC_FSR1
+    incf    COUNTER, F, A
+    incf    COUNTER, F, A
+    clrf    DELETE_FLAG, A
     return
 
 SPECIAL_ACTIONS:
