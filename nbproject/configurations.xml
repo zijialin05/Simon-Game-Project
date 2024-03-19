@@ -21,6 +21,8 @@
       <itemPath>Decimal_Convert.s</itemPath>
       <itemPath>Integer_Bitmaps.s</itemPath>
       <itemPath>Stage_Bitmaps.s</itemPath>
+      <itemPath>LFSR_TEST_MODULE.s</itemPath>
+      <itemPath>options_output.s</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

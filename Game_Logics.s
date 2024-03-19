@@ -3,12 +3,12 @@
 global  LFSR_Step, LFSR_H, LFSR_L, TEMP, OUT, RESULT, LFSR_Load_Fixed_Seed
 global	GEN_RAND_SEQ, FSR0L, FSR0H, COUNTER, INPUT_SEQ, GENSEQ, INPTSEQ
 global	Game_Setup, LFSR_Load_Seed, OUTPUT_GEN_SEQ, GAME_START, CHAR_TO_CLEAR
-global	SCORE_1, SEQ_LEN
+global	SCORE_1, SEQ_LEN, LFSR_Setup, LFSR_RANDINT
 
 extrn	KP_Change, KPPrev, KPOWC, KP_ASCII_TO_VAL, KP_Setup, GLCD_Setup
 extrn	KP_DOWC, GLCD_delay_ms, Sound_Setup, Output_Bitmap, Clear_Bitmap
 extrn	OUT_SCORE, Clear_Score, home_display, failure_display, success_display
-extrn	GLCD_ZERO_INIT
+extrn	GLCD_ZERO_INIT, options_display
 
 psect	udata_bank5
 GENSEQ:		ds  0x80
@@ -62,6 +62,7 @@ GAME_SESSION:
     clrf    SCORE_1, A
     movf    SCORE_1, W, A
     call    OUT_SCORE
+    call    options_display
     movlw   0x03
     movwf   SEQ_LEN, A
 GAME_ROUND:
@@ -86,6 +87,7 @@ GAME_ROUND:
     call    SEQ_COMPARE
     btfss   WREG, 0
     bra	    FAILED_ROUND
+    call    GLCD_ZERO_INIT
     call    success_display
     movlw   0xFF
     call    GLCD_delay_ms
@@ -99,12 +101,13 @@ GAME_ROUND:
     incf    SCORE_1, F, A
     movf    SCORE_1, W, A
     call    OUT_SCORE
+    call    options_display
     movlw   0x09
     cpfsgt  SEQ_LEN, A
     incf    SEQ_LEN, F, A
     bra	    GAME_ROUND
 FAILED_ROUND:
-    call    Clear_Score
+    call    GLCD_ZERO_INIT
     call    failure_display
     movlw   0xFF
     call    GLCD_delay_ms
