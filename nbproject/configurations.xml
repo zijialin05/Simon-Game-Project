@@ -18,7 +18,6 @@
       <itemPath>main.s</itemPath>
       <itemPath>Game_Logics.s</itemPath>
       <itemPath>GLCD.s</itemPath>
-      <itemPath>LCD.s</itemPath>
       <itemPath>Decimal_Convert.s</itemPath>
       <itemPath>Integer_Bitmaps.s</itemPath>
       <itemPath>Stage_Bitmaps.s</itemPath>
